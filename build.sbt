@@ -6,9 +6,9 @@ version := "0.3.0-SNAPSHOT"
 
 scalacOptions += "-target:jvm-1.6"
 
-scalaVersion := "2.11.2"
+scalaVersion := "2.11.7"
 
-crossScalaVersions ++= Seq("2.10.4", "2.11.2")
+crossScalaVersions ++= Seq("2.10.6", "2.11.7")
 
 
 // Publish settings
@@ -46,10 +46,10 @@ pomExtra := (
 
 
 
-libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.0-M1"
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.3"
 
-libraryDependencies += "org.scalaj" %% "scalaj-http" % "1.1.0"
+libraryDependencies += "org.scalaj" %% "scalaj-http" % "1.1.5"
 
-libraryDependencies += "org.mockito" % "mockito-core" % "1.8.5" % "test"
+libraryDependencies += "org.mockito" % "mockito-core" % "1.10.19" % "test"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.1" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.5" % "test"
