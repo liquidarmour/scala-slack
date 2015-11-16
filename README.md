@@ -2,8 +2,7 @@
 
 scala-slack is a simple, extensible client library for Scala that provides an interface to the [Slack](http://slack.com) API.
 
-.. image:: https://travis-ci.org/flyberry-capital/scala-slack.svg
-    :target: https://travis-ci.org/flyberry-capital/scala-slack
+[![Build Status](https://travis-ci.org/flyberry-capital/scala-slack.svg)](https://travis-ci.org/flyberry-capital/scala-slack)
 
 _Note: scala-slack is a partial implementation of the Slack API. The Slack API is under heavy development, and this library
 is subject to frequent change._
