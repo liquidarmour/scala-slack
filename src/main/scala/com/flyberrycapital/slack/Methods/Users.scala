@@ -20,37 +20,23 @@
  * THE SOFTWARE.
  */
 
-package com.flyberrycapital.slack
+package com.flyberrycapital.slack.Methods
+
+import com.flyberrycapital.slack.HttpClient
 
 
 /**
- * A simple Scala client for Slack (http://slack.com/).
- *
- * @param apiToken Your Slack API token (https://api.slack.com/).
- */
-class SlackClient(private val apiToken: String) {
-	protected val BASE_URL = "https://slack.com/api"
+  * The container for Slack's 'users' methods (https://api.slack.com/methods).
+  */
+class Users(httpClient: HttpClient, apiToken: String) {
+  import com.flyberrycapital.slack.Responses.UserListResponse
 
-   protected val httpClient = new HttpClient()
-
-   import com.flyberrycapital.slack.Methods._
-
-   val api = new API(httpClient, apiToken)
-   val auth = new Auth(httpClient, apiToken)
-   val channels = new Channels(httpClient, apiToken)
-   val chat = new Chat(httpClient, apiToken)
-   val im = new IM(httpClient, apiToken)
-   val users = new Users(httpClient, apiToken)
-
-   def connTimeout(ms: Int): SlackClient = {
-      httpClient.connTimeout(ms)
-
-      this
-   }
-
-   def readTimeout(ms: Int): SlackClient = {
-      httpClient.readTimeout(ms)
-
-      this
-   }
+  /**
+    * https://api.slack.com/methods/users.list
+    */
+  def list(params: Map[String, String] = Map()): UserListResponse = {
+    val cleanedParams = params + ("token" -> apiToken)
+    val responseDict = httpClient.get("users.list", cleanedParams)
+    responseDict.as[UserListResponse.UserListResponseRaw].get
+  }
 }

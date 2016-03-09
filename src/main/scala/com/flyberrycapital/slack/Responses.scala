@@ -23,6 +23,7 @@
 package com.flyberrycapital.slack
 
 import org.joda.time.DateTime
+import play.api.libs.json.Json
 
 
 /**
@@ -40,9 +41,19 @@ object Responses {
    case class ChannelSetTopicResponse(ok: Boolean, topic: String) extends SlackResponse
    case class IMCloseResponse(ok: Boolean, no_op: Boolean, already_closed: Boolean) extends SlackResponse
    case class IMMarkResponse(ok: Boolean) extends SlackResponse
-   case class IMOpenResponse(ok: Boolean, channelId: String, no_op: Boolean, 
+   case class IMOpenResponse(ok: Boolean, channelId: String, no_op: Boolean,
                              already_open: Boolean) extends SlackResponse
    case class IMListResponse(ok: Boolean, ims: List[SlackIM]) extends SlackResponse
-   case class IMHistoryResponse(ok: Boolean, messages: List[SlackMessage], 
+   case class IMHistoryResponse(ok: Boolean, messages: List[SlackMessage],
                                 hasMore: Boolean, isLimited: Boolean)
+
+   case class UserListResponse(ok: Boolean, members: List[SlackMember])
+   object UserListResponse {
+      case class UserListResponseRaw(ok: Boolean, members: List[SlackMember.SlackMemberRaw]) {
+         def get: UserListResponse = UserListResponse(ok, members.map(_.get))
+      }
+      object UserListResponseRaw {
+         implicit val jsonFormat = Json.format[UserListResponseRaw]
+      }
+   }
 }

@@ -22,35 +22,40 @@
 
 package com.flyberrycapital.slack
 
+import play.api.libs.json.{JsValue, Json}
+
 
 /**
- * A simple Scala client for Slack (http://slack.com/).
- *
- * @param apiToken Your Slack API token (https://api.slack.com/).
- */
-class SlackClient(private val apiToken: String) {
-	protected val BASE_URL = "https://slack.com/api"
+  * Class for representing a Slack member
+  */
+case class SlackMember(
+    id: String,
+    name: String,
+    deleted: Boolean,
+    color: Option[String],
+    profile: Map[String, JsValue],
+    isAdmin: Option[Boolean],
+    isOwner: Option[Boolean],
+    has2Fa: Option[Boolean],
+    hasFiles: Option[Boolean]
+)
 
-   protected val httpClient = new HttpClient()
+object SlackMember {
+  case class SlackMemberRaw(
+      id: String,
+      name: String,
+      deleted: Boolean,
+      color: Option[String],
+      profile: Map[String, JsValue],
+      is_admin: Option[Boolean],
+      is_owner: Option[Boolean],
+      has_2fa: Option[Boolean],
+      has_files: Option[Boolean]
+  ) {
+    def get: SlackMember = SlackMember(id, name, deleted, color, profile, is_admin, is_owner, has_2fa, has_files)
+  }
 
-   import com.flyberrycapital.slack.Methods._
-
-   val api = new API(httpClient, apiToken)
-   val auth = new Auth(httpClient, apiToken)
-   val channels = new Channels(httpClient, apiToken)
-   val chat = new Chat(httpClient, apiToken)
-   val im = new IM(httpClient, apiToken)
-   val users = new Users(httpClient, apiToken)
-
-   def connTimeout(ms: Int): SlackClient = {
-      httpClient.connTimeout(ms)
-
-      this
-   }
-
-   def readTimeout(ms: Int): SlackClient = {
-      httpClient.readTimeout(ms)
-
-      this
-   }
+  object SlackMemberRaw {
+    implicit val jsonFormat = Json.format[SlackMemberRaw]
+  }
 }
