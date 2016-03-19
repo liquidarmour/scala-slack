@@ -20,23 +20,42 @@
  * THE SOFTWARE.
  */
 
-package com.flyberrycapital.slack.Methods
+package com.ponkotuy.slack
 
-import com.flyberrycapital.slack.HttpClient
+import play.api.libs.json.{JsValue, Json}
 
 
 /**
-  * The container for Slack's 'users' methods (https://api.slack.com/methods).
+  * Class for representing a Slack member
   */
-class Users(httpClient: HttpClient, apiToken: String) {
-  import com.flyberrycapital.slack.Responses.UserListResponse
+case class SlackMember(
+    id: String,
+    name: String,
+    deleted: Boolean,
+    color: Option[String],
+    profile: Map[String, JsValue],
+    isAdmin: Option[Boolean],
+    isOwner: Option[Boolean],
+    has2Fa: Option[Boolean],
+    hasFiles: Option[Boolean]
+)
 
-  /**
-    * https://api.slack.com/methods/users.list
-    */
-  def list(params: Map[String, String] = Map()): UserListResponse = {
-    val cleanedParams = params + ("token" -> apiToken)
-    val responseDict = httpClient.get("users.list", cleanedParams)
-    responseDict.as[UserListResponse.UserListResponseRaw].get
+object SlackMember {
+  case class SlackMemberRaw(
+      id: String,
+      name: String,
+      deleted: Boolean,
+      color: Option[String],
+      profile: Map[String, JsValue],
+      is_admin: Option[Boolean],
+      is_owner: Option[Boolean],
+      has_2fa: Option[Boolean],
+      has_files: Option[Boolean]
+  ) {
+    def get: SlackMember = SlackMember(id, name, deleted, color, profile, is_admin, is_owner, has_2fa, has_files)
+  }
+
+  object SlackMemberRaw {
+    implicit val jsonFormat = Json.format[SlackMemberRaw]
   }
 }

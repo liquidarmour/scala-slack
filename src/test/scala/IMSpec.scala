@@ -19,8 +19,8 @@
  * THE SOFTWARE.
  */
 
-import com.flyberrycapital.slack.HttpClient
-import com.flyberrycapital.slack.Methods.IM
+import com.ponkotuy.slack.HttpClient
+import com.ponkotuy.slack.Methods.IM
 import org.joda.time.{DateTimeZone, DateTime}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar

@@ -1,14 +1,15 @@
+
 name := "scala-slack"
 
-organization := "com.flyberrycapital"
+organization := "com.ponkotuy"
 
-version := "0.3.0-SNAPSHOT"
+version := "0.4.0-SNAPSHOT"
 
 scalacOptions += "-target:jvm-1.6"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
-crossScalaVersions ++= Seq("2.10.6", "2.11.7")
+crossScalaVersions ++= Seq("2.10.6", "2.11.8")
 
 
 // Publish settings
@@ -52,4 +53,4 @@ libraryDependencies += "org.scalaj" %% "scalaj-http" % "1.1.5"
 
 libraryDependencies += "org.mockito" % "mockito-core" % "1.10.19" % "test"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"

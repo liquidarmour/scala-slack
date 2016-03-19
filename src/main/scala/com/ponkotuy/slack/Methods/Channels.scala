@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-package com.flyberrycapital.slack.Methods
+package com.ponkotuy.slack.Methods
 
-import com.flyberrycapital.slack.{SlackChannel, SlackMessage, HttpClient}
+import com.ponkotuy.slack.{SlackChannel, SlackMessage, HttpClient}
 import org.joda.time.DateTime
 import play.api.libs.json.{JsObject, JsValue}
 
@@ -34,7 +34,7 @@ import play.api.libs.json.{JsObject, JsValue}
  */
 class Channels(httpClient: HttpClient, apiToken: String) {
 
-   import com.flyberrycapital.slack.Responses._
+   import com.ponkotuy.slack.Responses._
 
    /**
     * https://api.slack.com/methods/channels.history

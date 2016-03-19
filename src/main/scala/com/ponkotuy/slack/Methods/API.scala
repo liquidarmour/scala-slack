@@ -20,37 +20,34 @@
  * THE SOFTWARE.
  */
 
-package com.flyberrycapital.slack
+package com.ponkotuy.slack.Methods
+
+import com.ponkotuy.slack.HttpClient
 
 
 /**
- * A simple Scala client for Slack (http://slack.com/).
- *
- * @param apiToken Your Slack API token (https://api.slack.com/).
+ * The container for Slack's 'api' methods (https://api.slack.com/methods).
  */
-class SlackClient(private val apiToken: String) {
-	protected val BASE_URL = "https://slack.com/api"
+class API(httpClient: HttpClient, apiToken: String) {
 
-   protected val httpClient = new HttpClient()
+   import com.ponkotuy.slack.Responses._
 
-   import com.flyberrycapital.slack.Methods._
+   /**
+    * See: https://api.slack.com/methods/api.test
+    *
+    * @param error Example error response to return. If not given, Slack will return an "ok" status.
+    * @param params Map of example key-value pairs to return.
+    * @return APITestResponse object
+    */
+   def test(error: String = null, params: Map[String, String] = Map()): APITestResponse = {
+      var newParams: Map[String, String] = params
 
-   val api = new API(httpClient, apiToken)
-   val auth = new Auth(httpClient, apiToken)
-   val channels = new Channels(httpClient, apiToken)
-   val chat = new Chat(httpClient, apiToken)
-   val im = new IM(httpClient, apiToken)
-   val users = new Users(httpClient, apiToken)
+      if (error != null)
+         newParams = params + ("error" -> error)
 
-   def connTimeout(ms: Int): SlackClient = {
-      httpClient.connTimeout(ms)
+      val responseDict = httpClient.get("api.test", newParams)
 
-      this
+      APITestResponse((responseDict \ "ok").as[Boolean], (responseDict \ "args").asOpt[Map[String, String]])
    }
 
-   def readTimeout(ms: Int): SlackClient = {
-      httpClient.readTimeout(ms)
-
-      this
-   }
 }

@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-package com.flyberrycapital.slack.Methods
+package com.ponkotuy.slack.Methods
 
-import com.flyberrycapital.slack.HttpClient
+import com.ponkotuy.slack.HttpClient
 import org.joda.time.DateTime
 
 
@@ -31,7 +31,7 @@ import org.joda.time.DateTime
  */
 class Chat(httpClient: HttpClient, apiToken: String) {
 
-   import com.flyberrycapital.slack.Responses._
+   import com.ponkotuy.slack.Responses._
 
    /**
     * https://api.slack.com/methods/chat.delete

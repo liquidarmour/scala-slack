@@ -20,34 +20,23 @@
  * THE SOFTWARE.
  */
 
-package com.flyberrycapital.slack.Methods
+package com.ponkotuy.slack.Methods
 
-import com.flyberrycapital.slack.HttpClient
+import com.ponkotuy.slack.HttpClient
 
 
 /**
- * The container for Slack's 'api' methods (https://api.slack.com/methods).
- */
-class API(httpClient: HttpClient, apiToken: String) {
+  * The container for Slack's 'users' methods (https://api.slack.com/methods).
+  */
+class Users(httpClient: HttpClient, apiToken: String) {
+  import com.ponkotuy.slack.Responses.UserListResponse
 
-   import com.flyberrycapital.slack.Responses._
-
-   /**
-    * See: https://api.slack.com/methods/api.test
-    *
-    * @param error Example error response to return. If not given, Slack will return an "ok" status.
-    * @param params Map of example key-value pairs to return.
-    * @return APITestResponse object
+  /**
+    * https://api.slack.com/methods/users.list
     */
-   def test(error: String = null, params: Map[String, String] = Map()): APITestResponse = {
-      var newParams: Map[String, String] = params
-
-      if (error != null)
-         newParams = params + ("error" -> error)
-
-      val responseDict = httpClient.get("api.test", newParams)
-
-      APITestResponse((responseDict \ "ok").as[Boolean], (responseDict \ "args").asOpt[Map[String, String]])
-   }
-
+  def list(params: Map[String, String] = Map()): UserListResponse = {
+    val cleanedParams = params + ("token" -> apiToken)
+    val responseDict = httpClient.get("users.list", cleanedParams)
+    responseDict.as[UserListResponse.UserListResponseRaw].get
+  }
 }

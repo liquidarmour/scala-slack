@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-package com.flyberrycapital.slack.Methods
+package com.ponkotuy.slack.Methods
 
-import com.flyberrycapital.slack.HttpClient
+import com.ponkotuy.slack.HttpClient
 
 
 /**
@@ -30,7 +30,7 @@ import com.flyberrycapital.slack.HttpClient
  */
 class Auth(httpClient: HttpClient, apiToken: String) {
 
-   import com.flyberrycapital.slack.Responses._
+   import com.ponkotuy.slack.Responses._
 
    /**
     * See: https://api.slack.com/methods/auth.test

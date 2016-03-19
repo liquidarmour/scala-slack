@@ -17,9 +17,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.flyberrycapital.slack.Methods
+package com.ponkotuy.slack.Methods
 
-import com.flyberrycapital.slack.{HttpClient, SlackIM, SlackMessage}
+import com.ponkotuy.slack.{HttpClient, SlackIM, SlackMessage}
 import org.joda.time.DateTime
 import play.api.libs.json.{JsObject, JsValue}
 
@@ -30,7 +30,7 @@ import play.api.libs.json.{JsObject, JsValue}
  */
 class IM(httpClient: HttpClient, apiToken: String) {
 
-   import com.flyberrycapital.slack.Responses._
+   import com.ponkotuy.slack.Responses._
 
    /**
     * https://api.slack.com/methods/im.close

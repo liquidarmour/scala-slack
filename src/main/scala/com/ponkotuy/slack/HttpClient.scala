@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package com.flyberrycapital.slack
+package com.ponkotuy.slack
 
 import play.api.libs.json.{Json, JsValue}
 

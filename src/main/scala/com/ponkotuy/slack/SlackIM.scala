@@ -19,11 +19,11 @@
  * THE SOFTWARE.
  */
 
-package com.flyberrycapital.slack
+package com.ponkotuy.slack
 
 /**
  * Class for representing a Slack IM channel.
- * 
+ *
  * @param id The IM channel ID.
  * @param user The user ID of the "calling user"
  * @param created A UNIX timestamp corresponding to the IM creation data/time.

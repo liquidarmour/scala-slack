@@ -20,8 +20,7 @@
  * THE SOFTWARE.
  */
 
-package com.flyberrycapital.slack
-
+package com.ponkotuy.slack
 
 /**
  * Exceptions for errors returned by the web API
