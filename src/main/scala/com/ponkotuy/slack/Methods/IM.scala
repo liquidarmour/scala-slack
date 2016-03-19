@@ -19,9 +19,8 @@
  */
 package com.ponkotuy.slack.Methods
 
-import com.ponkotuy.slack.{HttpClient, SlackIM, SlackMessage}
-import org.joda.time.DateTime
-import play.api.libs.json.{JsObject, JsValue}
+import com.ponkotuy.slack.{HttpClient, SlackMessage}
+import org.json4s.DefaultFormats
 
 /**
  * The container for Slack's 'im' methods (https://api.slack.com/methods).
@@ -29,153 +28,111 @@ import play.api.libs.json.{JsObject, JsValue}
  * <i>Note: This is a partial implementation, and some (i.e. most) methods are unimplemented.</i>
  */
 class IM(httpClient: HttpClient, apiToken: String) {
+  import com.ponkotuy.slack.Responses._
 
-   import com.ponkotuy.slack.Responses._
+  implicit val default = DefaultFormats
 
-   /**
+  /**
     * https://api.slack.com/methods/im.close
     *
     * @param channel The channel ID for the direct message history to close.
     * @return IMCloseResponse
     */
-   def close(channel: String): IMCloseResponse = {
-      val params = Map("channel" -> channel, "token" -> apiToken)
+  def close(channel: String): Option[IMCloseResponse] = {
+    val params = Map("channel" -> channel, "token" -> apiToken)
 
-      val responseDict = httpClient.get("im.close", params)
+    val responseDict = httpClient.get("im.close", params)
 
-      IMCloseResponse(
-         (responseDict \ "ok").as[Boolean],
-         (responseDict \ "no_op").asOpt[Boolean].getOrElse(false),
-         (responseDict \ "already_closed").asOpt[Boolean].getOrElse(false)
-      )
-   }
+    responseDict.extractOpt[IMCloseResponse]
+  }
 
-   /**
+  /**
     * https://api.slack.com/methods/im.history
     *
     * The format is exactly the same as channels.history, with the exception that we call im.history.
-    * Code copied from [[com.flyberrycapital.slack.Methods.Channels]]
+    * Code copied from [[com.ponkotuy.slack.Methods.Channels]]
     *
     * @param channel The channel ID of the IM to get history for.
-    * @param params A map of optional parameters and their values.
+    * @param params  A map of optional parameters and their values.
     * @return ChannelHistoryResponse
     */
-   def history(channel: String, params: Map[String, String] = Map()): ChannelHistoryResponse = {
-      val cleanedParams = params + ("channel" -> channel, "token" -> apiToken)
+  def history(channel: String, params: Map[String, String] = Map()): Option[ChannelHistoryResponse] = {
+    val cleanedParams = params +("channel" -> channel, "token" -> apiToken)
 
-      val responseDict = httpClient.get("im.history", cleanedParams)
+    val responseDict = httpClient.get("im.history", cleanedParams)
 
-      val messages = (responseDict \ "messages").as[List[JsObject]] map { (x) =>
-         val user = Option((x \ "user").asOpt[String]
-            .getOrElse((x \ "user").asOpt[String]
-            .getOrElse(null)))
+    responseDict.extractOpt[ChannelHistoryResponse]
+  }
 
-         SlackMessage(
-            (x \ "type").as[String],
-            (x \ "ts").as[String],
-            user,
-            (x \ "text").asOpt[String],
-            (x \ "is_starred").asOpt[Boolean].getOrElse(false),
-            (x \ "attachments").asOpt[List[JsValue]].getOrElse(List()),
-            new DateTime(((x \ "ts").as[String].toDouble * 1000).toLong)
-         )
-      }
-
-      ChannelHistoryResponse(
-         (responseDict \ "ok").as[Boolean],
-         messages,
-         (responseDict \ "has_more").asOpt[Boolean].getOrElse(false),
-         (responseDict \ "is_limited").asOpt[Boolean].getOrElse(false)
-      )
-   }
-
-   /**
+  /**
     * A wrapper around the im.history method that allows users to stream through a channel's past messages
     * seamlessly without having to worry about pagination and multiple queries.
     *
     * @param channel The channel ID to fetch history for.
-    * @param params A map of optional parameters and their values.
+    * @param params  A map of optional parameters and their values.
     * @return Iterator of SlackMessages, ordered by time in descending order.
     */
-   def historyStream(channel: String, params: Map[String, String] = Map()): Iterator[SlackMessage] = {
-      new Iterator[SlackMessage] {
-         var hist = history(channel, params = params)
-         var messages = hist.messages
+  def historyStream(channel: String, params: Map[String, String] = Map()): Iterator[SlackMessage] = {
+    new Iterator[SlackMessage] {
+      var hist = history(channel, params = params)
+      var messages = hist.map(_.messages).getOrElse(Nil)
 
-         def hasNext = messages.nonEmpty
+      def hasNext = messages.nonEmpty
 
-         def next() = {
-            val m = messages.head
-            messages = messages.tail
+      def next() = {
+        val m = messages.head
+        messages = messages.tail
 
-            if (messages.isEmpty && hist.hasMore) {
-               hist = history(channel, params = params + ("latest" -> m.ts))
-               messages = hist.messages
-            }
+        if (messages.isEmpty && hist.exists(_.hasMore)) {
+          hist = history(channel, params = params + ("latest" -> m.ts))
+          messages = hist.map(_.messages).getOrElse(Nil)
+        }
 
-            m
-         }
+        m
       }
-   }
+    }
+  }
 
-   /**
+  /**
     * https://api.slack.com/methods/im.list
     *
     * @return IMListResponse of all open IM channels
     */
-   def list(): IMListResponse = {
-      val params = Map("token" -> apiToken)
+  def list(): Option[IMListResponse] = {
+    val params = Map("token" -> apiToken)
 
-      val responseDict = httpClient.get("im.list", params)
+    val responseDict = httpClient.get("im.list", params)
 
-      val ims = (responseDict \ "ims").as[List[JsObject]] map { (im) =>
-         SlackIM(
-            (im \ "id").as[String],
-            (im \ "user").as[String],
-            (im \ "created").as[Int],
-            (im \ "is_user_deleted").as[Boolean]
-         )
-      }
-      IMListResponse(
-         (responseDict \ "ok").as[Boolean],
-         ims
-      )
-   }
+    responseDict.extractOpt[IMListResponse]
+  }
 
-   /**
+  /**
     * https://api.slack.com/methods/im.mark
     *
     * @param channel The channel ID for the direct message history to set reading cursor in.
-    * @param params ts Timestamp of the most recently seen message.
+    * @param ts Timestamp of the most recently seen message.
     * @return IMMarkResponse
     */
-   def mark(channel: String, ts: String): IMMarkResponse = {
-      val params = Map("channel" -> channel, "ts" -> ts, "token" -> apiToken)
+  def mark(channel: String, ts: String): Option[IMMarkResponse] = {
+    val params = Map("channel" -> channel, "ts" -> ts, "token" -> apiToken)
 
-      val responseDict = httpClient.get("im.mark", params)
+    val responseDict = httpClient.get("im.mark", params)
 
-      IMMarkResponse(
-         (responseDict \ "ok").as[Boolean]
-      )
-   }
+    responseDict.extractOpt[IMMarkResponse]
+  }
 
-   /**
+  /**
     * https://api.slack.com/methods/im.open
     *
     * @param user The user ID for the user to open a direct message channel with.
     * @return IMOpenResponse
     */
-   def open(user: String): IMOpenResponse = {
-      val params = Map("user" -> user, "token" -> apiToken)
+  def open(user: String): Option[IMOpenResponse] = {
+    val params = Map("user" -> user, "token" -> apiToken)
 
-      val responseDict = httpClient.get("im.open", params)
+    val responseDict = httpClient.get("im.open", params)
 
-      IMOpenResponse(
-         (responseDict \ "ok").as[Boolean],
-         (responseDict \ "channel" \ "id").as[String],
-         (responseDict \ "no_op").asOpt[Boolean].getOrElse(false),
-         (responseDict \ "already_open").asOpt[Boolean].getOrElse(false)
-      )
-   }
+    responseDict.extractOpt[IMOpenResponse]
+  }
 
 }

@@ -22,8 +22,7 @@
 
 package com.ponkotuy.slack
 
-import org.joda.time.DateTime
-import play.api.libs.json.JsValue
+import org.json4s.JValue
 
 /**
  * Class for representing a Slack channel
@@ -38,7 +37,6 @@ import play.api.libs.json.JsValue
  * @param numMembers The number of members in this channel.
  * @param topic A Play JsValue object containing topic information. Refer to Slack API documentation for possible fields.
  * @param purpose A Play JsValue object containing purpose information. Refer to Slack API documentation for possible fields.
- * @param createdDate The 'created' field as a Joda DateTime object.
  */
-case class SlackChannel(id: String, name: String, created: Int, creator: String, isArchived: Boolean, isMember: Boolean,
-                        members: List[String], numMembers: Int, topic: JsValue, purpose: JsValue, createdDate: DateTime)
+case class SlackChannel(id: String, name: String, created: Long, creator: String, isArchived: Boolean, isMember: Boolean,
+                        members: List[String], numMembers: Int, topic: JValue, purpose: JValue)

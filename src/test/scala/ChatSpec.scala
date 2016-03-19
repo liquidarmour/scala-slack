@@ -1,11 +1,3 @@
-import com.ponkotuy.slack.HttpClient
-import com.ponkotuy.slack.Methods.Chat
-import org.joda.time.{DateTime, DateTimeZone}
-import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
-import play.api.libs.json.Json
-
 /*
  * Copyright (c) 2014 Flyberry Capital, LLC
  *
@@ -28,136 +20,113 @@ import play.api.libs.json.Json
  * THE SOFTWARE.
  */
 
+import com.ponkotuy.slack.HttpClient
+import com.ponkotuy.slack.Methods.Chat
+import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
+import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
+import org.json4s.JsonDSL._
+
 class ChatSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAfterEach {
+  private val testApiKey = "TEST_API_KEY"
+  private val testChannel = "C12345"
+  private val testTs = "1416960000"
+  private val testMessage = "This is a test."
+  private val testUpdateMessage = "This is an update."
 
-   private val testApiKey = "TEST_API_KEY"
-   private val testChannel = "C12345"
-   private val testTs = "1416960000"
-   private val testMessage = "This is a test."
-   private val testUpdateMessage = "This is an update."
+  private var mockHttpClient : HttpClient = _
+  var chat : Chat = _
 
-   private var mockHttpClient : HttpClient = _
-   var chat : Chat = _
+  override def beforeEach() {
+    mockHttpClient = mock[HttpClient]
 
-   override def beforeEach() {
-      mockHttpClient = mock[HttpClient]
+    val testChannelReturn = ("ok" -> true) ~ ("channel" -> testChannel) ~ ("ts" -> testTs)
+    when(mockHttpClient.post("chat.delete", Map(
+      "channel" -> testChannel,
+      "ts" -> testTs,
+      "token" -> testApiKey
+    ))).thenReturn(testChannelReturn)
 
-      when(mockHttpClient.post("chat.delete", Map(
-         "channel" -> testChannel,
-         "ts" -> testTs,
-         "token" -> testApiKey
-      )))
-         .thenReturn(Json.parse(
-         s"""
-           |{
-           |    "ok": true,
-           |    "channel": "$testChannel",
-           |    "ts": "$testTs"
-           |}
-         """.stripMargin))
+    when(mockHttpClient.post("chat.postMessage", Map(
+      "channel" -> testChannel,
+      "token" -> testApiKey,
+      "text" -> testMessage
+    ))).thenReturn(testChannelReturn)
 
-      when(mockHttpClient.post("chat.postMessage", Map(
-         "channel" -> testChannel,
-         "token" -> testApiKey,
-         "text" -> testMessage
-      )))
-         .thenReturn(Json.parse(
-         s"""
-           |{
-           |    "ok": true,
-           |    "channel": "$testChannel",
-           |    "ts": "$testTs"
-           |}
-         """.stripMargin))
+    when(mockHttpClient.post("chat.update", Map(
+      "channel" -> testChannel,
+      "ts" -> testTs,
+      "token" -> testApiKey,
+      "text" -> testUpdateMessage
+    ))).thenReturn(("ok" -> true) ~ ("channel" -> testChannel) ~ ("ts" -> testTs) ~ ("text" -> testUpdateMessage))
+    chat = new Chat(mockHttpClient, testApiKey)
+  }
 
-      when(mockHttpClient.post("chat.update", Map(
-         "channel" -> testChannel,
-         "ts" -> testTs,
-         "token" -> testApiKey,
-         "text" -> testUpdateMessage
-      )))
-         .thenReturn(Json.parse(
-         s"""
-           |{
-           |    "ok": true,
-           |    "channel": "$testChannel",
-           |    "ts": "$testTs",
-           |    "text": "$testUpdateMessage"
-           |}
-         """.stripMargin))
+  "Chat.delete()" should "delete a message when given a channel and timestamp" in {
+    val response = chat.delete(testChannel, testTs).get
 
-      chat = new Chat(mockHttpClient, testApiKey)
-   }
+    response.ok shouldBe true
+    response.channel shouldBe testChannel
+    response.ts shouldBe testTs
 
-   "Chat.delete()" should "delete a message when given a channel and timestamp" in {
-      val response = chat.delete(testChannel, testTs)
+    verify(mockHttpClient).post("chat.delete", Map("channel" -> testChannel, "ts" -> testTs, "token" -> testApiKey))
+  }
 
-      response.ok shouldBe true
-      response.channel shouldBe testChannel
-      response.ts shouldBe testTs
-      response.date.isEqual(new DateTime(2014, 11, 26, 0, 0, DateTimeZone.UTC)) shouldBe true
+  "Chat.delete()" should "delete a message when given a response object" in {
+    val messageResponse = chat.postMessage(testChannel, testMessage).get
+    val response = chat.delete(messageResponse).get
 
-      verify(mockHttpClient).post("chat.delete", Map("channel" -> testChannel, "ts" -> testTs, "token" -> testApiKey))
-   }
+    response.ok shouldBe true
+    response.channel shouldBe testChannel
+    response.ts shouldBe testTs
 
-   "Chat.delete()" should "delete a message when given a response object" in {
-      val messageResponse = chat.postMessage(testChannel, testMessage)
-      val response = chat.delete(messageResponse)
+    verify(mockHttpClient).post("chat.delete", Map("channel" -> testChannel, "ts" -> testTs, "token" -> testApiKey))
+  }
 
-      response.ok shouldBe true
-      response.channel shouldBe testChannel
-      response.ts shouldBe testTs
-      response.date.isEqual(new DateTime(2014, 11, 26, 0, 0, DateTimeZone.UTC)) shouldBe true
+  "Chat.postMessage()" should "post a new message" in {
+    val response = chat.postMessage(testChannel, testMessage).get
 
-      verify(mockHttpClient).post("chat.delete", Map("channel" -> testChannel, "ts" -> testTs, "token" -> testApiKey))
-   }
+    response.ok shouldBe true
+    response.ts shouldBe testTs
+    response.channel shouldBe testChannel
 
-   "Chat.postMessage()" should "post a new message" in {
-      val response = chat.postMessage(testChannel, testMessage)
+    verify(mockHttpClient).post("chat.postMessage", Map("channel" -> testChannel, "text" -> testMessage, "token" -> testApiKey))
+  }
 
-      response.ok shouldBe true
-      response.ts shouldBe testTs
-      response.channel shouldBe testChannel
+  "Chat.update()" should "update a message when given a channel, timestamp, and update text" in {
+     val response = chat.update(testChannel, testTs, testUpdateMessage).get
 
-      verify(mockHttpClient).post("chat.postMessage", Map("channel" -> testChannel, "text" -> testMessage, "token" -> testApiKey))
-   }
+    response.ok shouldBe true
+    response.channel shouldBe testChannel
+    response.ts shouldBe testTs
 
-   "Chat.update()" should "update a message when given a channel, timestamp, and update text" in {
-      val response = chat.update(testChannel, testTs, testUpdateMessage)
-
-      response.ok shouldBe true
-      response.channel shouldBe testChannel
-      response.ts shouldBe testTs
-      response.date.isEqual(new DateTime(2014, 11, 26, 0, 0, DateTimeZone.UTC)) shouldBe true
-
-      verify(mockHttpClient).post(
-         "chat.update",
-         Map(
-            "channel" -> testChannel,
-            "ts" -> testTs,
-            "token" -> testApiKey,
-            "text" -> testUpdateMessage
-         )
+    verify(mockHttpClient).post(
+      "chat.update",
+      Map(
+        "channel" -> testChannel,
+        "ts" -> testTs,
+        "token" -> testApiKey,
+        "text" -> testUpdateMessage
       )
-   }
+    )
+  }
 
-   "Chat.update()" should "update a message when given a response object and update text" in {
-      val messageResponse = chat.postMessage(testChannel, testMessage)
-      val response = chat.update(messageResponse, testUpdateMessage)
+  "Chat.update()" should "update a message when given a response object and update text" in {
+    val messageResponse = chat.postMessage(testChannel, testMessage).get
+    val response = chat.update(messageResponse, testUpdateMessage).get
 
-      response.ok shouldBe true
-      response.channel shouldBe testChannel
-      response.ts shouldBe testTs
-      response.date.isEqual(new DateTime(2014, 11, 26, 0, 0, DateTimeZone.UTC)) shouldBe true
+    response.ok shouldBe true
+    response.channel shouldBe testChannel
+    response.ts shouldBe testTs
 
-      verify(mockHttpClient).post(
-         "chat.update",
-         Map(
-            "channel" -> testChannel,
-            "ts" -> testTs,
-            "token" -> testApiKey,
-            "text" -> testUpdateMessage
-         )
+    verify(mockHttpClient).post(
+      "chat.update",
+      Map(
+        "channel" -> testChannel,
+        "ts" -> testTs,
+        "token" -> testApiKey,
+        "text" -> testUpdateMessage
       )
-   }
+    )
+  }
 }

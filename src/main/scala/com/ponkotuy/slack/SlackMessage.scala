@@ -22,9 +22,7 @@
 
 package com.ponkotuy.slack
 
-import org.joda.time.DateTime
-import play.api.libs.json.JsValue
-
+import org.json4s.JValue
 
 /**
  * Class for representing a Slack message
@@ -37,7 +35,8 @@ import play.api.libs.json.JsValue
  * @param isStarred A boolean indicating whether this message has been starred (favorited).
  * @param attachments A list of JsValues (https://www.playframework.com/documentation/2.4.x/ScalaJson) representing JSON
  *                    objects containing attachments.
- * @param time The timestamp of the message converted into a Joda DateTime object.
  */
 case class SlackMessage(messageType: String, ts: String, user: Option[String], text: Option[String], isStarred: Boolean,
-                        attachments: List[JsValue], time: DateTime)
+                        attachments: List[JValue]) {
+  def timeStamp: Double = ts.toDouble
+}

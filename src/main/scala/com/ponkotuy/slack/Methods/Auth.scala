@@ -23,33 +23,28 @@
 package com.ponkotuy.slack.Methods
 
 import com.ponkotuy.slack.HttpClient
+import org.json4s.DefaultFormats
 
 
 /**
  * The container for Slack's 'auth' methods (https://api.slack.com/methods).
  */
 class Auth(httpClient: HttpClient, apiToken: String) {
+  import com.ponkotuy.slack.Responses._
 
-   import com.ponkotuy.slack.Responses._
+  implicit val formats = DefaultFormats
 
-   /**
+  /**
     * See: https://api.slack.com/methods/auth.test
     *
     * @return AuthTestResponse object
     */
-   def test(): AuthTestResponse = {
-      val params = Map("token" -> apiToken)
+  def test(): Option[AuthTestResponse] = {
+    val params = Map("token" -> apiToken)
 
-      val responseDict = httpClient.get("auth.test", params)
+    val responseDict = httpClient.get("auth.test", params)
 
-      AuthTestResponse(
-         (responseDict \ "ok").as[Boolean],
-         (responseDict \ "url").as[String],
-         (responseDict \ "team").as[String],
-         (responseDict \ "user").as[String],
-         (responseDict \ "team_id").as[String],
-         (responseDict \ "user_id").as[String]
-      )
-   }
+    responseDict.extractOpt[AuthTestResponse]
+  }
 
 }

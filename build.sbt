@@ -9,9 +9,6 @@ scalacOptions += "-target:jvm-1.6"
 
 scalaVersion := "2.11.8"
 
-crossScalaVersions ++= Seq("2.10.6", "2.11.8")
-
-
 // Publish settings
 
 publishMavenStyle := true
@@ -47,10 +44,9 @@ pomExtra := (
 
 
 
-libraryDependencies += "com.typesafe.play" %% "play-json" % "2.4.3"
-
-libraryDependencies += "org.scalaj" %% "scalaj-http" % "1.1.5"
-
-libraryDependencies += "org.mockito" % "mockito-core" % "1.10.19" % "test"
-
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
+libraryDependencies ++= Seq(
+  "org.json4s" %% "json4s-native" % "3.3.0",
+  "org.scalaj" %% "scalaj-http" % "1.1.5",
+  "org.mockito" % "mockito-core" % "1.10.19" % "test",
+  "org.scalatest" %% "scalatest" % "2.2.6" % "test"
+)

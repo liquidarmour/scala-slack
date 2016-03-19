@@ -1,10 +1,3 @@
-import com.ponkotuy.slack.HttpClient
-import com.ponkotuy.slack.Methods.Auth
-import org.scalatest.mock.MockitoSugar
-import org.mockito.Mockito._
-import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
-import play.api.libs.json.Json
-
 /*
  * Copyright (c) 2014 Flyberry Capital, LLC
  *
@@ -27,43 +20,47 @@ import play.api.libs.json.Json
  * THE SOFTWARE.
  */
 
+import com.ponkotuy.slack.HttpClient
+import com.ponkotuy.slack.Methods.Auth
+import org.scalatest.mock.MockitoSugar
+import org.mockito.Mockito._
+import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
+import org.json4s.JsonDSL._
+
 class AuthSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAfterEach {
 
-   private val testApiKey = "TEST_API_KEY"
+  private val testApiKey = "TEST_API_KEY"
 
-   private var mockHttpClient : HttpClient = _
-   var auth : Auth = _
+  private var mockHttpClient: HttpClient = _
+  var auth: Auth = _
 
-   override def beforeEach() {
-      mockHttpClient = mock[HttpClient]
-      when(mockHttpClient.get("auth.test", Map("token" -> testApiKey)))
-         .thenReturn(Json.parse(
+  override def beforeEach() {
+    val json = ("ok" -> true) ~
+        ("url" -> "test.slack.com") ~
+        ("team" -> "Test Team") ~
+        ("user" -> "testuser") ~
+        ("team_id" -> "T12345") ~
+        ("user_id" -> "U12345")
+    mockHttpClient = mock[HttpClient]
+    when(mockHttpClient.get("auth.test", Map("token" -> testApiKey)))
+        .thenReturn(json)
 
-         """
-              |{
-              |   "ok": true,
-              |   "url": "test.slack.com",
-              |   "team": "Test Team",
-              |   "user": "testuser",
-              |   "team_id": "T12345",
-              |   "user_id": "U12345"
-              |}
-            """.stripMargin))
+    auth = new Auth(mockHttpClient, testApiKey)
+  }
 
-      auth = new Auth(mockHttpClient, testApiKey)
-   }
+  "Auth.test()" should
+      "make a call to auth.test and return the response in an AuthTestResponse object" in {
+    val response = auth.test().get
 
-   "Auth.test()" should "make a call to auth.test and return the response in an AuthTestResponse object" in {
-      val response = auth.test()
+    response.ok shouldBe true
+    response.url shouldBe "test.slack.com"
+    response.team shouldBe "Test Team"
+    response.user shouldBe "testuser"
+    response.teamID shouldBe "T12345"
+    response.userID shouldBe "U12345"
 
-      response.ok shouldBe true
-      response.url shouldBe "test.slack.com"
-      response.team shouldBe "Test Team"
-      response.user shouldBe "testuser"
-      response.teamID shouldBe "T12345"
-      response.userID shouldBe "U12345"
-
-      verify(mockHttpClient).get("auth.test", Map("token" -> testApiKey))
-   }
+    verify(mockHttpClient).get(
+      "auth.test", Map("token" -> testApiKey))
+  }
 
 }
