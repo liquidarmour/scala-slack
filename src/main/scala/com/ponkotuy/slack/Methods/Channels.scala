@@ -22,9 +22,8 @@
 
 package com.ponkotuy.slack.Methods
 
-import com.ponkotuy.slack.{SlackChannel, SlackMessage, HttpClient}
-import org.joda.time.DateTime
-import play.api.libs.json.{JsObject, JsValue}
+import com.ponkotuy.slack.{HttpClient, SlackMessage}
+import org.json4s.DefaultFormats
 
 
 /**
@@ -33,122 +32,80 @@ import play.api.libs.json.{JsObject, JsValue}
  * <i>Note: This is a partial implementation, and some (i.e. most) methods are unimplemented.</i>
  */
 class Channels(httpClient: HttpClient, apiToken: String) {
+  import com.ponkotuy.slack.Responses._
 
-   import com.ponkotuy.slack.Responses._
+  implicit val format = DefaultFormats
 
-   /**
+  /**
     * https://api.slack.com/methods/channels.history
     *
     * @param channel The channel ID to fetch history for.
-    * @param params A map of optional parameters and their values.
+    * @param params  A map of optional parameters and their values.
     * @return ChannelHistoryResponse
     */
-   def history(channel: String, params: Map[String, String] = Map()): ChannelHistoryResponse = {
+  def history(channel: String, params: Map[String, String] = Map()): Option[ChannelHistoryResponse] = {
+    val cleanedParams = params +("channel" -> channel, "token" -> apiToken)
+    val responseDict = httpClient.get("channels.history", cleanedParams)
+    responseDict.camelizeKeys.extractOpt[ChannelHistoryResponse]
+  }
 
-      val cleanedParams = params + ("channel" -> channel, "token" -> apiToken)
-
-      val responseDict = httpClient.get("channels.history", cleanedParams)
-
-      val messages = (responseDict \ "messages").as[List[JsObject]] map { (x) =>
-         val user = Option((x \ "user").asOpt[String]
-            .getOrElse((x \ "user").asOpt[String]
-            .getOrElse(null)))
-
-         SlackMessage(
-            (x \ "type").as[String],
-            (x \ "ts").as[String],
-            user,
-            (x \ "text").asOpt[String],
-            (x \ "is_starred").asOpt[Boolean].getOrElse(false),
-            (x \ "attachments").asOpt[List[JsValue]].getOrElse(List()),
-            new DateTime(((x \ "ts").as[String].toDouble * 1000).toLong)
-         )
-      }
-
-      ChannelHistoryResponse(
-         (responseDict \ "ok").as[Boolean],
-         messages,
-         (responseDict \ "has_more").asOpt[Boolean].getOrElse(false),
-         (responseDict \ "is_limited").asOpt[Boolean].getOrElse(false)
-      )
-   }
-
-   /**
+  /**
     * A wrapper around the channels.history method that allows users to stream through a channel's past messages
     * seamlessly without having to worry about pagination and multiple queries.
     *
     * @param channel The channel ID to fetch history for.
-    * @param params A map of optional parameters and their values.
+    * @param params  A map of optional parameters and their values.
     * @return Iterator of SlackMessages, ordered by time in descending order.
     */
-   def historyStream(channel: String, params: Map[String, String] = Map()): Iterator[SlackMessage] = {
-      new Iterator[SlackMessage] {
-         var hist = history(channel, params = params)
-         var messages = hist.messages
+  def historyStream(channel: String, params: Map[String, String] = Map()): Iterator[SlackMessage] = {
+    new Iterator[SlackMessage] {
+      var hist = history(channel, params = params)
+      var messages = hist.map(_.messages).getOrElse(Nil)
 
-         def hasNext = messages.nonEmpty
+      def hasNext = messages.nonEmpty
 
-         def next() = {
-            val m = messages.head
-            messages = messages.tail
+      def next() = {
+        val m = messages.head
+        messages = messages.tail
 
-            if (messages.isEmpty && hist.hasMore) {
-               hist = history(channel, params = params + ("latest" -> m.ts))
-               messages = hist.messages
-            }
-
-            m
-         }
+        if (messages.isEmpty && hist.exists(_.hasMore)) {
+          hist = history(channel, params = params + ("latest" -> m.ts))
+          messages = hist.map(_.messages).getOrElse(Nil)
+        }
+        m
       }
-   }
+    }
+  }
 
-   /**
+  /**
     * https://api.slack.com/methods/channels.list
     *
     * @param params A map of optional parameters and their values.
     * @return A ChannelListResponse object.
     */
-   def list(params: Map[String, String] = Map()): ChannelListResponse = {
+  def list(params: Map[String, String] = Map()): Option[ChannelListResponse] = {
 
-      val cleanedParams = params + ("token" -> apiToken)
+    val cleanedParams = params + ("token" -> apiToken)
 
-      val responseDict = httpClient.get("channels.list", cleanedParams)
+    val responseDict = httpClient.get("channels.list", cleanedParams)
 
-      val channels = (responseDict \ "channels").as[List[JsObject]] map { (x) =>
+    responseDict.camelizeKeys.extractOpt[ChannelListResponse]
+  }
 
-         SlackChannel(
-            (x \ "id").as[String],
-            (x \ "name").as[String],
-            (x \ "created").as[Int],
-            (x \ "creator").as[String],
-            (x \ "is_archived").as[Boolean],
-            (x \ "is_member").as[Boolean],
-            (x \ "members").as[List[String]],
-            (x \ "num_members").as[Int],
-            (x \ "topic").as[JsValue],
-            (x \ "purpose").as[JsValue],
-            new DateTime((x \ "created").as[Int])
-         )
-
-      }
-
-      ChannelListResponse((responseDict \ "ok").as[Boolean], channels)
-   }
-
-   /**
+  /**
     * https://api.slack.com/methods/channels.setTopic
     *
     * @param channel The channel ID to set topic for
-    * @param topic The topic to set
-    * @param params A map of optional parameters and their values.
+    * @param topic   The topic to set
+    * @param params  A map of optional parameters and their values.
     * @return A ChannelSetTopicResponse object.
     */
-   def setTopic(channel: String, topic: String, params: Map[String, String] = Map()): ChannelSetTopicResponse = {
+  def setTopic(channel: String, topic: String, params: Map[String, String] = Map()): Option[ChannelSetTopicResponse] = {
 
-      val cleanedParams = params + ("channel" -> channel, "topic" -> topic, "token" -> apiToken)
+    val cleanedParams = params +("channel" -> channel, "topic" -> topic, "token" -> apiToken)
 
-      val responseDict = httpClient.get("channels.setTopic", cleanedParams)
+    val responseDict = httpClient.get("channels.setTopic", cleanedParams)
 
-      ChannelSetTopicResponse((responseDict \ "ok").as[Boolean], (responseDict \ "topic").as[String])
-   }
+    responseDict.camelizeKeys.extractOpt[ChannelSetTopicResponse]
+  }
 }

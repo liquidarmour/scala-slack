@@ -23,100 +23,85 @@
 package com.ponkotuy.slack.Methods
 
 import com.ponkotuy.slack.HttpClient
-import org.joda.time.DateTime
+import org.json4s.DefaultFormats
 
 
 /**
  * The container for Slack's 'chat' methods (https://api.slack.com/methods).
  */
 class Chat(httpClient: HttpClient, apiToken: String) {
+  import com.ponkotuy.slack.Responses._
 
-   import com.ponkotuy.slack.Responses._
+  implicit val format = DefaultFormats
 
-   /**
+  /**
     * https://api.slack.com/methods/chat.delete
     *
     * @param channel The channel ID of the message to be deleted.
-    * @param ts The timestamp of the message to be deleted.
+    * @param ts      The timestamp of the message to be deleted.
     * @return PostMessageResponse object.
     */
-   def delete(channel: String, ts: String): PostMessageResponse = {
-      val params = Map("channel" -> channel, "ts" -> ts.toString, "token" -> apiToken)
+  def delete(channel: String, ts: String): Option[PostMessageResponse] = {
+    val params = Map("channel" -> channel, "ts" -> ts.toString, "token" -> apiToken)
 
-      val responseDict = httpClient.post("chat.delete", params)
+    val responseDict = httpClient.post("chat.delete", params)
 
-      PostMessageResponse(
-         (responseDict \ "ok").as[Boolean],
-         (responseDict \ "ts").as[String],
-         (responseDict \ "channel").as[String],
-         new DateTime(((responseDict \ "ts").as[String].toDouble * 1000).toLong)
-      )
-   }
+    responseDict.extractOpt[PostMessageResponse]
+  }
 
-   /**
+  /**
     * https://api.slack.com/methods/chat.delete
     *
     * @param postMessageResponse A PostMessageResponse object generated from a call to postMessage() or update().
     * @return PostMessageResponse object.
     */
-   def delete(postMessageResponse: PostMessageResponse): PostMessageResponse = {
-      delete(postMessageResponse.channel, postMessageResponse.ts)
-   }
+  def delete(postMessageResponse: PostMessageResponse): Option[PostMessageResponse] = {
+    delete(postMessageResponse.channel, postMessageResponse.ts)
+  }
 
-   /**
+  /**
     * https://api.slack.com/methods/chat.postMessage
     *
     * @param channel The channel ID of the channel to send the message to.
-    * @param text The text of the message to send.
-    * @param params Optional additional params.
+    * @param text    The text of the message to send.
+    * @param params  Optional additional params.
     * @return PostMessageResponse object.
     */
-   def postMessage(channel: String, text: String,
-                   params: Map[String, String] = Map()): PostMessageResponse = {
+  def postMessage(channel: String, text: String, params: Map[String, String] = Map()): Option[PostMessageResponse] = {
 
-      val cleanedParams = params ++
-         Map("channel" -> channel, "text" -> text, "token" -> apiToken)
+    val cleanedParams = params ++
+        Map("channel" -> channel, "text" -> text, "token" -> apiToken)
 
-      val responseDict = httpClient.post("chat.postMessage", cleanedParams)
+    val responseDict = httpClient.post("chat.postMessage", cleanedParams)
 
-      PostMessageResponse(
-         (responseDict \ "ok").as[Boolean],
-         (responseDict \ "ts").as[String],
-         (responseDict \ "channel").as[String],
-         new DateTime(((responseDict \ "ts").as[String].toDouble * 1000).toLong)
-      )
-   }
+    responseDict.extractOpt[PostMessageResponse]
+  }
 
-   /**
+  /**
     * https://api.slack.com/methods/chat.update
     *
     * @param channel The channel ID of the message to be updated.
-    * @param ts The timestamp of the message to be updated.
-    * @param text The updated text for the message.
+    * @param ts      The timestamp of the message to be updated.
+    * @param text    The updated text for the message.
     * @return PostMessageResponse object.
     */
-   def update(channel: String, ts: String, text: String): PostMessageResponse = {
-      val params = Map("channel" -> channel, "ts" -> ts.toString, "token" -> apiToken, "text" -> text)
+  def update(channel: String, ts: String, text: String): Option[PostMessageResponse] = {
+    val params = Map("channel" -> channel, "ts" -> ts.toString, "token" -> apiToken, "text" -> text)
 
-      val responseDict = httpClient.post("chat.update", params)
+    val responseDict = httpClient.post("chat.update", params)
 
-      PostMessageResponse(
-         (responseDict \ "ok").as[Boolean],
-         (responseDict \ "ts").as[String],
-         (responseDict \ "channel").as[String],
-         new DateTime(((responseDict \ "ts").as[String].toDouble * 1000).toLong)
-      )
-   }
+    responseDict.extractOpt[PostMessageResponse]
+  }
 
-   /**
+  /**
     * https://api.slack.com/methods/chat.update
     *
     * @param postMessageResponse A PostMessageResponse object generated from a call to postMessage() or update().
-    * @param text The updated text for the message.
+    * @param text                The updated text for the message.
     * @return PostMessageResponse object.
     */
-   def update(postMessageResponse: PostMessageResponse, text: String): PostMessageResponse = {
-      update(postMessageResponse.channel, postMessageResponse.ts, text)
-   }
+  def update(postMessageResponse: PostMessageResponse, text: String): Option[PostMessageResponse] = {
+    update(postMessageResponse.channel, postMessageResponse.ts, text)
+  }
 
 }

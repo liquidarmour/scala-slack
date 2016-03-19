@@ -22,8 +22,8 @@
 
 package com.ponkotuy.slack
 
-import play.api.libs.json.{Json, JsValue}
-
+import org.json4s._
+import org.json4s.native.JsonMethods._
 import scalaj.http.{Http, HttpOptions}
 
 
@@ -33,75 +33,76 @@ import scalaj.http.{Http, HttpOptions}
  * @param BaseURL The base URL for API calls.
  */
 class HttpClient(BaseURL: String = "https://slack.com/api") {
+  import Exceptions._
 
-   import Exceptions._
+  implicit val formats = DefaultFormats
 
-   private var connTimeoutMs: Int = 100
-   private var readTimeoutMs: Int = 500
+  private[this] var connTimeoutMs: Int = 100
+  private[this] var readTimeoutMs: Int = 500
 
-   @inline private def buildURL(method: String) = s"$BaseURL/$method"
+  @inline private def buildURL(method: String) = s"$BaseURL/$method"
 
-   private def checkResponse(responseJSON: JsValue) {
+  private def checkResponse(responseJSON: JValue) {
 
-      if ((responseJSON \ "ok").asOpt[Boolean] == Some(true))
-         return
+    if ((responseJSON \ "ok").extractOpt[Boolean].contains(true))
+      return
 
-      (responseJSON \ "error").asOpt[String] match {
-         case Some("invalid_auth") =>        throw new InvalidAuthError
-         case Some("not_authed") =>          throw new NotAuthedError
-         case Some("account_inactive") =>    throw new AccountInactiveError
-         case Some("channel_not_found") =>   throw new ChannelNotFoundError
-         case Some("is_archived") =>         throw new ChannelArchivedError
-         case Some("not_in_channel") =>      throw new NotInChannelError
-         case Some("rate_limited") =>        throw new RateLimitedError
-         case Some("no_text") =>             throw new NoMessageTextProvidedError
-         case Some("msg_too_long") =>        throw new MessageTooLongError
-         case Some("message_not_found") =>   throw new MessageNotFoundError
-         case Some("edit_window_closed") =>  throw new EditWindowClosedError
-         case Some("cant_update_message") => throw new CantUpdateMessageError
-         case Some("cant_delete_message") => throw new CantDeleteMessageError
-         case Some("invalid_ts_latest") =>   throw new InvalidTsLatestError
-         case Some("invalid_ts_oldest") =>   throw new InvalidTsOldestError
-         case Some(x) =>                     throw new UnknownSlackError(x)
-         case None =>
-            throw new UnknownSlackError(s"Invalid response from Slack server: $responseJSON")
-      }
-   }
+    (responseJSON \ "error").extractOpt[String] match {
+      case Some("invalid_auth") => throw new InvalidAuthError
+      case Some("not_authed") => throw new NotAuthedError
+      case Some("account_inactive") => throw new AccountInactiveError
+      case Some("channel_not_found") => throw new ChannelNotFoundError
+      case Some("is_archived") => throw new ChannelArchivedError
+      case Some("not_in_channel") => throw new NotInChannelError
+      case Some("rate_limited") => throw new RateLimitedError
+      case Some("no_text") => throw new NoMessageTextProvidedError
+      case Some("msg_too_long") => throw new MessageTooLongError
+      case Some("message_not_found") => throw new MessageNotFoundError
+      case Some("edit_window_closed") => throw new EditWindowClosedError
+      case Some("cant_update_message") => throw new CantUpdateMessageError
+      case Some("cant_delete_message") => throw new CantDeleteMessageError
+      case Some("invalid_ts_latest") => throw new InvalidTsLatestError
+      case Some("invalid_ts_oldest") => throw new InvalidTsOldestError
+      case Some(x) => throw new UnknownSlackError(x)
+      case None =>
+        throw new UnknownSlackError(s"Invalid response from Slack server: $responseJSON")
+    }
+  }
 
-   def get(method: String, params: Map[String, String]): JsValue = {
-      val result = Json.parse(Http(buildURL(method))
-         .option(HttpOptions.connTimeout(connTimeoutMs))
-         .option(HttpOptions.readTimeout(readTimeoutMs))
-         .params(params)
-         .asString.body)
+  def get(method: String, params: Map[String, String]): JValue = {
+    val result = parse(Http(buildURL(method))
+        .option(HttpOptions.connTimeout(connTimeoutMs))
+        .option(HttpOptions.readTimeout(readTimeoutMs))
+        .params(params)
+        .asString.body)
 
-      checkResponse(result)
+    checkResponse(result)
 
-      result
-   }
+    result
+  }
 
-   def post(method: String, data: Map[String, String]): JsValue = {
-      val result = Json.parse(Http(buildURL(method))
-         .postForm
-         .option(HttpOptions.connTimeout(connTimeoutMs))
-         .option(HttpOptions.readTimeout(readTimeoutMs))
-         .params(data)
-         .asString.body)
+  def post(method: String, data: Map[String, String]): JValue = {
+    val result = parse(Http(buildURL(method))
+        .postForm
+        .option(HttpOptions.connTimeout(connTimeoutMs))
+        .option(HttpOptions.readTimeout(readTimeoutMs))
+        .params(data)
+        .asString.body)
 
-      checkResponse(result)
+    checkResponse(result)
 
-      result
-   }
+    result
+  }
 
-   def connTimeout(ms: Int): HttpClient = {
-      connTimeoutMs = ms
+  def connTimeout(ms: Int): HttpClient = {
+    connTimeoutMs = ms
 
-      this
-   }
+    this
+  }
 
-   def readTimeout(ms: Int): HttpClient = {
-      readTimeoutMs = ms
+  def readTimeout(ms: Int): HttpClient = {
+    readTimeoutMs = ms
 
-      this
-   }
+    this
+  }
 }

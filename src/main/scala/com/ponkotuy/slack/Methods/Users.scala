@@ -23,6 +23,7 @@
 package com.ponkotuy.slack.Methods
 
 import com.ponkotuy.slack.HttpClient
+import org.json4s.DefaultFormats
 
 
 /**
@@ -31,12 +32,14 @@ import com.ponkotuy.slack.HttpClient
 class Users(httpClient: HttpClient, apiToken: String) {
   import com.ponkotuy.slack.Responses.UserListResponse
 
+  implicit val format = DefaultFormats
+
   /**
     * https://api.slack.com/methods/users.list
     */
-  def list(params: Map[String, String] = Map()): UserListResponse = {
+  def list(params: Map[String, String] = Map()): Option[UserListResponse] = {
     val cleanedParams = params + ("token" -> apiToken)
     val responseDict = httpClient.get("users.list", cleanedParams)
-    responseDict.as[UserListResponse.UserListResponseRaw].get
+    responseDict.camelizeKeys.extractOpt[UserListResponse]
   }
 }

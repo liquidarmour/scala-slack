@@ -22,7 +22,7 @@
 
 package com.ponkotuy.slack
 
-import play.api.libs.json.{JsValue, Json}
+import org.json4s.JValue
 
 
 /**
@@ -33,29 +33,9 @@ case class SlackMember(
     name: String,
     deleted: Boolean,
     color: Option[String],
-    profile: Map[String, JsValue],
-    isAdmin: Option[Boolean],
-    isOwner: Option[Boolean],
-    has2Fa: Option[Boolean],
-    hasFiles: Option[Boolean]
+    profile: Map[String, JValue],
+    is_admin: Option[Boolean],
+    is_owner: Option[Boolean],
+    has_2fa: Option[Boolean],
+    has_files: Option[Boolean]
 )
-
-object SlackMember {
-  case class SlackMemberRaw(
-      id: String,
-      name: String,
-      deleted: Boolean,
-      color: Option[String],
-      profile: Map[String, JsValue],
-      is_admin: Option[Boolean],
-      is_owner: Option[Boolean],
-      has_2fa: Option[Boolean],
-      has_files: Option[Boolean]
-  ) {
-    def get: SlackMember = SlackMember(id, name, deleted, color, profile, is_admin, is_owner, has_2fa, has_files)
-  }
-
-  object SlackMemberRaw {
-    implicit val jsonFormat = Json.format[SlackMemberRaw]
-  }
-}

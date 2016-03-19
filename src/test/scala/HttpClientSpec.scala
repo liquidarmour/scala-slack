@@ -1,7 +1,8 @@
 import com.ponkotuy.slack.Exceptions._
 import com.ponkotuy.slack.HttpClient
-import org.scalatest.{PrivateMethodTester, BeforeAndAfterEach, FlatSpec, Matchers}
-import play.api.libs.json.Json
+import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers, PrivateMethodTester}
+import org.json4s._
+import org.json4s.JsonDSL._
 
 /*
  * Copyright (c) 2014 Flyberry Capital, LLC
@@ -27,211 +28,86 @@ import play.api.libs.json.Json
 
 class HttpClientSpec extends FlatSpec with Matchers with BeforeAndAfterEach with PrivateMethodTester {
 
-   val httpClient = new HttpClient()
-   val checkResponse = PrivateMethod[String]('checkResponse)
+  val httpClient = new HttpClient()
+  val checkResponse = PrivateMethod[String]('checkResponse)
 
-   "checkResponse()" should "raise no error if \"ok\" is true" in {
-      val response = Json.parse(
-         """
-           | { "ok" : true }
-         """.stripMargin)
+  "checkResponse()" should "raise no error if \"ok\" is true" in {
+    val response = JObject(JField("ok", true))
+    noException should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-      noException should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
+  "checkResponse()" should "raise an InvalidAuthError if the invalid_auth error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "invalid_auth")
+    an[InvalidAuthError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-   "checkResponse()" should "raise an InvalidAuthError if the invalid_auth error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "invalid_auth"
-           | }
-         """.stripMargin
-      )
+  "checkResponse()" should "raise a NotAuthedError if the not_authed error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "not_authed")
+    a[NotAuthedError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-      an [InvalidAuthError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
+  "checkResponse()" should "raise an AccountInactiveError if the account_inactive error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "account_inactive")
+    an[AccountInactiveError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-   "checkResponse()" should "raise a NotAuthedError if the not_authed error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "not_authed"
-           | }
-         """.stripMargin
-      )
+  "checkResponse()" should "raise a ChannelNotFoundError if the channel_not_found error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "channel_not_found")
+    a[ChannelNotFoundError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-      a [NotAuthedError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
+  "checkResponse()" should "raise a NotInChannelError if the not_in_channel error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "not_in_channel")
+    a[NotInChannelError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-   "checkResponse()" should "raise an AccountInactiveError if the account_inactive error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "account_inactive"
-           | }
-         """.stripMargin
-      )
+  "checkResponse()" should "raise a RateLimitedError if the rate_limited error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "rate_limited")
+    a[RateLimitedError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-      an [AccountInactiveError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
+  "checkResponse()" should "raise a NoMessageTextProvidedError if the no_text error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "no_text")
+    an[NoMessageTextProvidedError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-   "checkResponse()" should "raise a ChannelNotFoundError if the channel_not_found error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "channel_not_found"
-           | }
-         """.stripMargin
-      )
+  "checkResponse()" should "raise a MessageTooLongError if the msg_too_long error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "msg_too_long")
+    a[MessageTooLongError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-      a [ChannelNotFoundError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
+  "checkResponse()" should "raise a MessageNotFoundError if the message_not_found error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "message_not_found")
+    an[MessageNotFoundError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-   "checkResponse()" should "raise a NotInChannelError if the not_in_channel error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "not_in_channel"
-           | }
-         """.stripMargin
-      )
+  "checkResponse()" should "raise an EditWindowClosedError if the edit_window_closed error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "edit_window_closed")
+    an[EditWindowClosedError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-      a [NotInChannelError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
+  "checkResponse()" should "raise an CantUpdateMessageError if the cant_update_message error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "cant_update_message")
+    an[CantUpdateMessageError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-   "checkResponse()" should "raise a RateLimitedError if the rate_limited error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "rate_limited"
-           | }
-         """.stripMargin
-      )
+  "checkResponse()" should "raise a CantDeleteMessageError if the cant_delete_message error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "cant_delete_message")
+    an[CantDeleteMessageError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-      a [RateLimitedError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
+  "checkResponse()" should "raise an InvalidTsLatestError if the invalid_ts_latest error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "invalid_ts_latest")
+    an[InvalidTsLatestError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-   "checkResponse()" should "raise a NoMessageTextProvidedError if the no_text error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "no_text"
-           | }
-         """.stripMargin
-      )
+  "checkResponse()" should "raise an InvalidTsOldest if the invalid_ts_oldest error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "invalid_ts_oldest")
+    an[InvalidTsOldestError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 
-      an [NoMessageTextProvidedError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
-
-   "checkResponse()" should "raise a MessageTooLongError if the msg_too_long error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "msg_too_long"
-           | }
-         """.stripMargin
-      )
-
-      a [MessageTooLongError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
-
-   "checkResponse()" should "raise a MessageNotFoundError if the message_not_found error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "message_not_found"
-           | }
-         """.stripMargin
-      )
-
-      an [MessageNotFoundError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
-
-   "checkResponse()" should "raise an EditWindowClosedError if the edit_window_closed error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "edit_window_closed"
-           | }
-         """.stripMargin
-      )
-
-      an [EditWindowClosedError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
-
-   "checkResponse()" should "raise an CantUpdateMessageError if the cant_update_message error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "cant_update_message"
-           | }
-         """.stripMargin
-      )
-
-      an [CantUpdateMessageError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
-
-   "checkResponse()" should "raise a CantDeleteMessageError if the cant_delete_message error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "cant_delete_message"
-           | }
-         """.stripMargin
-      )
-
-      an [CantDeleteMessageError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
-
-   "checkResponse()" should "raise an InvalidTsLatestError if the invalid_ts_latest error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "invalid_ts_latest"
-           | }
-         """.stripMargin
-      )
-
-      an [InvalidTsLatestError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
-
-   "checkResponse()" should "raise an InvalidTsOldest if the invalid_ts_oldest error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "invalid_ts_oldest"
-           | }
-         """.stripMargin
-      )
-
-      an [InvalidTsOldestError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
-
-   "checkResponse()" should "raise an UnknownSlackError if an unrecognized error is received" in {
-      val response = Json.parse(
-         """
-           | {
-           |   "ok" : false,
-           |   "error": "unrecognized_error"
-           | }
-         """.stripMargin
-      )
-
-      an [UnknownSlackError] should be thrownBy (httpClient invokePrivate checkResponse(response))
-   }
-
+  "checkResponse()" should "raise an UnknownSlackError if an unrecognized error is received" in {
+    val response = ("ok" -> false) ~ ("error" -> "unrecognized_error")
+    an[UnknownSlackError] should be thrownBy (httpClient invokePrivate checkResponse(response))
+  }
 }

@@ -27,6 +27,6 @@ package com.ponkotuy.slack
  * @param id The IM channel ID.
  * @param user The user ID of the "calling user"
  * @param created A UNIX timestamp corresponding to the IM creation data/time.
- * @param is_user_deleted Denotes if the other user's account has been disabled.
+ * @param isUserDeleted Denotes if the other user's account has been disabled.
  */
-case class SlackIM(id: String, user: String, created: Int, is_user_deleted: Boolean)
+case class SlackIM(id: String, isIm: Boolean, user: String, created: Long, isUserDeleted: Boolean)

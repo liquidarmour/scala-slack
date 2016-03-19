@@ -1,10 +1,10 @@
 import com.ponkotuy.slack.HttpClient
 import com.ponkotuy.slack.Methods.Channels
-import org.joda.time.{DateTimeZone, DateTime}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
-import play.api.libs.json.Json
+import org.json4s._
+import org.json4s.JsonDSL._
 
 /*
  * Copyright (c) 2014 Flyberry Capital, LLC
@@ -30,227 +30,154 @@ import play.api.libs.json.Json
 
 class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAfterEach {
 
-   private val testApiKey = "TEST_API_KEY"
+  private val testApiKey = "TEST_API_KEY"
 
-   private var mockHttpClient : HttpClient = _
-   var channels : Channels = _
+  private var mockHttpClient: HttpClient = _
+  var channels: Channels = _
 
-   override def beforeEach() {
-      mockHttpClient = mock[HttpClient]
-      when(mockHttpClient.get("channels.history", Map("channel" -> "C12345", "token" -> testApiKey)))
-         .thenReturn(Json.parse(
-         """
-           |{
-           |    "ok": true,
-           |    "latest": "1358547726.000003",
-           |    "messages": [
-           |        {
-           |            "type": "message",
-           |            "ts": "1358546515.000008",
-           |            "user": "U2147483896",
-           |            "text": "Hello"
-           |        },
-           |        {
-           |            "type": "message",
-           |            "ts": "1358546515.000007",
-           |            "user": "U2147483896",
-           |            "text": "World",
-           |            "is_starred": true
-           |        },
-           |        {
-           |            "type": "something_else",
-           |            "ts": "1358546515.000007",
-           |            "wibblr": true
-           |        }
-           |    ],
-           |    "has_more": true
-           |}
-         """.stripMargin))
+  private[this] def setHistoryMock(): Unit = {
+    val json = ("ok" -> true) ~
+        ("latest", "1358547726.000003") ~
+        ("messages", JArray(List(
+          ("type" -> "message") ~ ("ts" -> "1358546515.000008") ~ ("user" -> "U2147483896") ~ ("text" -> "Hello"),
+          ("type" -> "message") ~ ("ts" -> "1358546515.000007") ~ ("user" -> "U2147483896") ~ ("text" -> "World") ~ ("is_starred", true),
+          ("type" -> "something_else") ~ ("ts" -> "1358546515.000007") ~ ("wibblr" -> true)
+        ))) ~
+        ("has_more" -> true)
+    when(mockHttpClient.get("channels.history", Map("channel" -> "C12345", "token" -> testApiKey)))
+        .thenReturn(json)
+  }
 
-      when(mockHttpClient.get("channels.history", Map("channel" -> "C12345", "latest" -> "1358546515.000007", "token" -> testApiKey)))
-         .thenReturn(Json.parse(
-         """
-           |{
-           |    "ok": true,
-           |    "latest": "1358547726.000003",
-           |    "messages": [
-           |        {
-           |            "type": "message",
-           |            "ts": "1358546515.000008",
-           |            "user": "U2147483896",
-           |            "text": "Hello"
-           |        },
-           |        {
-           |            "type": "message",
-           |            "ts": "1358546515.000007",
-           |            "user": "U2147483896",
-           |            "text": "World",
-           |            "is_starred": true
-           |        }
-           |    ],
-           |    "has_more": false
-           |}
-         """.stripMargin))
+  private[this] def setHistoryWIthLastestMock(): Unit = {
+    val params = Map("channel" -> "C12345", "latest" -> "1358546515.000007", "token" -> testApiKey)
+    val json = ("ok" -> true) ~
+        ("lastest" -> "1358547726.000003") ~
+        ("messages" -> JArray(List(
+          ("type" -> "message") ~ ("ts" -> "1358546515.000008") ~ ("user" -> "U2147483896") ~ ("text" -> "Hello"),
+          ("type" -> "message") ~ ("ts" -> "1358546515.000007") ~ ("user" -> "U2147483896") ~ ("text" -> "World") ~ ("is_starred", true)
+        ))) ~
+        ("has_more" -> false)
+    when(mockHttpClient.get("channels.history", params))
+        .thenReturn(json)
+  }
 
-      when(mockHttpClient.get("channels.list", Map("token" -> testApiKey)))
-         .thenReturn(Json.parse(
-         """
-           |{
-           |    "ok": true,
-           |    "channels": [
-           |        {
-           |            "id": "C12345",
-           |            "name": "testchannel1",
-           |            "is_channel": true,
-           |            "created": 1408475169,
-           |            "creator": "U12345",
-           |            "is_archived": false,
-           |            "is_general": false,
-           |            "is_member": true,
-           |            "members": [
-           |                "U12345",
-           |                "U23456",
-           |                "U34567"
-           |            ],
-           |            "topic": {
-           |                "value": "",
-           |                "creator": "",
-           |                "last_set": "0"
-           |            },
-           |            "purpose": {
-           |                "value": "a test channel",
-           |                "creator": "U12345",
-           |                "last_set": "1408475170"
-           |            },
-           |            "num_members": 3
-           |        },
-           |        {
-           |            "id": "C23456",
-           |            "name": "testchannel2",
-           |            "is_channel": true,
-           |            "created": 1408419457,
-           |            "creator": "U12345",
-           |            "is_archived": false,
-           |            "is_general": false,
-           |            "is_member": true,
-           |            "members": [
-           |                "U12345",
-           |                "U23456",
-           |                "U34567",
-           |                "U45678",
-           |                "U56789"
-           |            ],
-           |            "topic": {
-           |                "value": "",
-           |                "creator": "",
-           |                "last_set": "0"
-           |            },
-           |            "purpose": {
-           |                "value": "Hang out with developers here!",
-           |                "creator": "U23456",
-           |                "last_set": "1408419457"
-           |            },
-           |            "num_members": 5
-           |        },
-           |        {
-           |            "id": "C34567",
-           |            "name": "testchannel3",
-           |            "is_channel": true,
-           |            "created": 1408419260,
-           |            "creator": "U23456",
-           |            "is_archived": false,
-           |            "is_general": true,
-           |            "is_member": true,
-           |            "members": [
-           |                "U12345",
-           |                "U23456",
-           |                "U34567",
-           |                "U45678",
-           |                "U56789",
-           |                "U67890"
-           |            ],
-           |            "topic": {
-           |                "value": "",
-           |                "creator": "",
-           |                "last_set": "0"
-           |            },
-           |            "purpose": {
-           |                "value": "This channel is for team-wide communication and announcements.",
-           |                "creator": "",
-           |                "last_set": "0"
-           |            },
-           |            "num_members": 6
-           |        }
-           |    ]
-           |}
-         """.stripMargin))
+  private[this] def setListMock(): Unit = {
+    val channelA = ("id" -> "C12345") ~
+        ("name" -> "testchannel1") ~
+        ("is_channel" -> true) ~
+        ("created" -> 1408475169) ~
+        ("creator" -> "U12345") ~
+        ("is_archived" -> false) ~
+        ("is_general" -> false) ~
+        ("is_member" -> true) ~
+        ("members" -> JArray(List("U12345", "U23456", "U34567"))) ~
+        ("topic" ->
+            ("value" -> "") ~ ("creator" -> "") ~ ("last_set" -> "0")) ~
+        ("purpose" ->
+            ("value" -> "a test channel") ~ ("creator" -> "U12345") ~ ("last_set" -> "1408475170")) ~
+        ("num_members" -> 3)
+    val channelB = ("id" -> "C23456") ~
+        ("name" -> "testchannel2") ~
+        ("is_channel" -> true) ~
+        ("created" -> 1408419457) ~
+        ("creator" -> "U12345") ~
+        ("is_archived" -> false) ~
+        ("is_general" -> false) ~
+        ("is_member" -> true) ~
+        ("members" -> JArray(List("U12345", "U23456", "U34567", "U45678", "U56789"))) ~
+        ("topic" ->
+            ("value" -> "") ~ ("creator" -> "") ~ ("last_set" -> "0")) ~
+        ("purpose" ->
+            ("value" -> "Hang out with developers here!") ~ ("creator" -> "U23456") ~ ("last_set" -> "1408419457")) ~
+        ("num_members" -> 5)
+    val channelC = ("id" -> "C34567") ~
+        ("name" -> "testchannel3") ~
+        ("is_channel" -> true) ~
+        ("created" -> 1408419260) ~
+        ("creator" -> "U23456") ~
+        ("is_archived" -> false) ~
+        ("is_general" -> true) ~
+        ("is_member" -> true) ~
+        ("members" -> JArray(List("U12345", "U23456", "U34567", "U45678", "U56789", "U67890"))) ~
+        ("topic" ->
+            ("value" -> "") ~ ("creator" -> "") ~ ("last_set" -> "0")) ~
+        ("purpose" ->
+            ("value" -> "This channel is for team-wide communication and announcements.") ~ ("creator" -> "") ~ ("last_set" -> "0")) ~
+        ("num_members" -> 6)
 
-      when(mockHttpClient.get("channels.setTopic", Map("channel" -> "C12345", "topic" -> "Test Topic", "token" -> testApiKey)))
-         .thenReturn(Json.parse(
-         """
-           |{
-           |    "ok": true,
-           |    "topic": "Test Topic"
-           |}
-         """.stripMargin))
+    val json = ("ok" -> true) ~ ("channels" -> JArray(List(channelA, channelB, channelC)))
 
-      channels = new Channels(mockHttpClient, testApiKey)
+    when(mockHttpClient.get("channels.list", Map("token" -> testApiKey)))
+        .thenReturn(json)
+  }
+
+  private[this] def setTopicMock(): Unit = {
+    when(mockHttpClient.get("channels.setTopic", Map("channel" -> "C12345", "topic" -> "Test Topic", "token" -> testApiKey)))
+        .thenReturn(("ok" -> true) ~ ("topic" -> "Test Topic"))
+  }
+
+  override def beforeEach() {
+    mockHttpClient = mock[HttpClient]
+    setHistoryMock()
+    setHistoryWIthLastestMock()
+    setListMock()
+    setTopicMock()
+    channels = new Channels(mockHttpClient, testApiKey)
    }
 
-   "Channels.history()" should "make a call to channels.history and return the response in an ChannelHistoryResponse object" in {
-      val response = channels.history("C12345")
+  "Channels.history()" should "make a call to channels.history and return the response in an ChannelHistoryResponse object" in {
+    val response = channels.history("C12345").get
 
-      response.ok shouldBe true
-      response.hasMore shouldBe true
-      response.isLimited shouldBe false
-      response.messages should have length 3
+    response.ok shouldBe true
+    response.hasMore shouldBe true
+    response.isLimited shouldBe None
+    response.messages should have length 3
 
-      val message = response.messages(0)
+    val message = response.messages.head
 
-      message.messageType shouldBe "message"
-      message.ts shouldBe "1358546515.000008"
-      message.user.get shouldBe "U2147483896"
-      message.text.get shouldBe "Hello"
-      message.time.isEqual(new DateTime(2013, 1, 18, 22, 1, 55, DateTimeZone.UTC)) shouldBe true
+    message.`type` shouldBe "message"
+    message.ts shouldBe "1358546515.000008"
+    message.user.get shouldBe "U2147483896"
+    message.text.get shouldBe "Hello"
 
-      verify(mockHttpClient).get("channels.history", Map("channel" -> "C12345", "token" -> testApiKey))
-   }
+    verify(mockHttpClient).get("channels.history", Map("channel" -> "C12345", "token" -> testApiKey))
+  }
 
-   "Channels.historyStream()" should "make repeated calls to channels.history and return a stream of messages" in {
-      val messages = channels.historyStream("C12345").toList
+  "Channels.historyStream()" should "make repeated calls to channels.history and return a stream of messages" in {
+    val messages = channels.historyStream("C12345").toList
 
-      messages should have length 5
+    messages should have length 5
 
-      verify(mockHttpClient).get("channels.history", Map("channel" -> "C12345", "latest" -> "1358546515.000007", "token" -> testApiKey))
-   }
+    verify(mockHttpClient).get("channels.history", Map("channel" -> "C12345", "latest" -> "1358546515.000007", "token" -> testApiKey))
+  }
 
-   "Channels.list()" should "list all channels available to a user" in {
-      val response = channels.list()
+  "Channels.list()" should "list all channels available to a user" in {
+    val response = channels.list().get
 
-      response.ok shouldBe true
-      response.channels should have length 3
+    response.ok shouldBe true
+    response.channels should have length 3
 
-      val channel = response.channels(0)
-      channel.id shouldBe "C12345"
-      channel.name shouldBe "testchannel1"
-      channel.created shouldBe 1408475169
-      channel.creator shouldBe "U12345"
-      channel.isArchived shouldBe false
-      channel.isMember shouldBe true
-      channel.members should have length 3
-      channel.numMembers shouldBe 3
-      (channel.purpose \ "value").as[String] shouldBe "a test channel"
+    val channel = response.channels.head
+    channel.id shouldBe "C12345"
+    channel.name shouldBe "testchannel1"
+    channel.created shouldBe 1408475169
+    channel.creator shouldBe "U12345"
+    channel.isArchived shouldBe false
+    channel.isMember shouldBe true
+    channel.members should have length 3
+    channel.numMembers shouldBe 3
+    (channel.purpose \ "value") shouldBe JString("a test channel")
 
-      verify(mockHttpClient).get("channels.list", Map("token" -> testApiKey))
-   }
+    verify(mockHttpClient).get("channels.list", Map("token" -> testApiKey))
+  }
 
-   "Channels.setTopic()" should "make a call to channels.setTopic and return the response in an ChannelSetTopicResponse object" in {
-      val response = channels.setTopic("C12345", "Test Topic")
+  "Channels.setTopic()" should "make a call to channels.setTopic and return the response in an ChannelSetTopicResponse object" in {
+    val response = channels.setTopic("C12345", "Test Topic").get
 
-      response.ok shouldBe true
-      response.topic shouldBe "Test Topic"
+    response.ok shouldBe true
+    response.topic shouldBe "Test Topic"
 
-      verify(mockHttpClient).get("channels.setTopic", Map("channel" -> "C12345", "topic" -> "Test Topic", "token" -> testApiKey))
-   }
-
+    verify(mockHttpClient).get("channels.setTopic", Map("channel" -> "C12345", "topic" ->
+        "Test Topic", "token" -> testApiKey))
+  }
 }
