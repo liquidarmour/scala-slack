@@ -39,8 +39,8 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
     val json = ("ok" -> true) ~
         ("latest", "1358547726.000003") ~
         ("messages", JArray(List(
-          ("type" -> "message") ~ ("ts" -> "1358546515.000008") ~ ("user" -> "U214783896") ~ ("text" -> "Hello"),
-          ("type" -> "message") ~ ("ts" -> "1358546515.000007") ~ ("user" -> "U214783896") ~ ("text" -> "World") ~ ("is_starred", true),
+          ("type" -> "message") ~ ("ts" -> "1358546515.000008") ~ ("user" -> "U2147483896") ~ ("text" -> "Hello"),
+          ("type" -> "message") ~ ("ts" -> "1358546515.000007") ~ ("user" -> "U2147483896") ~ ("text" -> "World") ~ ("is_starred", true),
           ("type" -> "something_else") ~ ("ts" -> "1358546515.000007") ~ ("wibblr" -> true)
         ))) ~
         ("has_more" -> true)
@@ -63,7 +63,7 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
 
   private[this] def setListMock(): Unit = {
     val channelA = ("id" -> "C12345") ~
-        ("name" -> "tesetchannel1") ~
+        ("name" -> "testchannel1") ~
         ("is_channel" -> true) ~
         ("created" -> 1408475169) ~
         ("creator" -> "U12345") ~
@@ -130,12 +130,12 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
 
     response.ok shouldBe true
     response.hasMore shouldBe true
-    response.isLimited shouldBe false
+    response.isLimited shouldBe None
     response.messages should have length 3
 
     val message = response.messages.head
 
-    message.messageType shouldBe "message"
+    message.`type` shouldBe "message"
     message.ts shouldBe "1358546515.000008"
     message.user.get shouldBe "U2147483896"
     message.text.get shouldBe "Hello"

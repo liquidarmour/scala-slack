@@ -146,21 +146,19 @@ class IMSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAfte
 
     val responseErr = im.close("D54321").get
     responseErr.ok shouldBe true
-    responseErr.no_op shouldBe true
-    responseErr.already_closed shouldBe true
+    responseErr.noOp shouldBe Some(true)
+    responseErr.alreadyClosed shouldBe Some(true)
   }
 
   "IM.history()" should "make a call to im.history and return the response in an ChannelHistoryResponse object" in {
     val response = im.history("C12345").get
-
     response.ok shouldBe true
     response.hasMore shouldBe true
-    response.isLimited shouldBe false
+    response.isLimited shouldBe None
     response.messages should have length 3
 
     val message = response.messages.head
-
-    message.messageType shouldBe "message"
+    message.`type` shouldBe "message"
     message.ts shouldBe "1358546515.000008"
     message.user.get shouldBe "U2147483896"
     message.text.get shouldBe "Hello"
@@ -184,13 +182,13 @@ class IMSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAfte
     im1.id shouldBe "D024BFF1M"
     im1.user shouldBe "USLACKBOT"
     im1.created shouldBe 1372105335
-    im1.is_user_deleted shouldBe false
+    im1.isUserDeleted shouldBe false
 
     val im2 = response.ims(1)
     im2.id shouldBe "D024BE7RE"
     im2.user shouldBe "U024BE7LH"
     im2.created shouldBe 1356250715
-    im2.is_user_deleted shouldBe false
+    im2.isUserDeleted shouldBe false
   }
 
   "IM.mark()" should "make a call to im.mark and return the response in an IMMarkResponse object" in {
@@ -202,13 +200,13 @@ class IMSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAfte
     val responseOk = im.open("U12345").get
     responseOk.ok shouldBe true
     responseOk.channel.id shouldBe "D024BFF1M"
-    responseOk.no_op shouldBe false
-    responseOk.already_open shouldBe false
+    responseOk.noOp shouldBe None
+    responseOk.alreadyOpen shouldBe None
 
     val responseErr = im.open("U54321").get
     responseErr.ok shouldBe true
     responseErr.channel.id shouldBe "D024BFF1M"
-    responseErr.no_op shouldBe true
-    responseErr.already_open shouldBe true
+    responseErr.noOp shouldBe Some(true)
+    responseErr.alreadyOpen shouldBe Some(true)
   }
 }

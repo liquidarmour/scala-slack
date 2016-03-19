@@ -56,8 +56,8 @@ class AuthSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAf
     response.url shouldBe "test.slack.com"
     response.team shouldBe "Test Team"
     response.user shouldBe "testuser"
-    response.teamID shouldBe "T12345"
-    response.userID shouldBe "U12345"
+    response.teamId shouldBe "T12345"
+    response.userId shouldBe "U12345"
 
     verify(mockHttpClient).get(
       "auth.test", Map("token" -> testApiKey))

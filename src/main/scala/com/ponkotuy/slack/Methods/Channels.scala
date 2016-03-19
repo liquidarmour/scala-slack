@@ -44,12 +44,9 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     * @return ChannelHistoryResponse
     */
   def history(channel: String, params: Map[String, String] = Map()): Option[ChannelHistoryResponse] = {
-
     val cleanedParams = params +("channel" -> channel, "token" -> apiToken)
-
     val responseDict = httpClient.get("channels.history", cleanedParams)
-
-    responseDict.extractOpt[ChannelHistoryResponse]
+    responseDict.camelizeKeys.extractOpt[ChannelHistoryResponse]
   }
 
   /**
@@ -92,7 +89,7 @@ class Channels(httpClient: HttpClient, apiToken: String) {
 
     val responseDict = httpClient.get("channels.list", cleanedParams)
 
-    responseDict.extractOpt[ChannelListResponse]
+    responseDict.camelizeKeys.extractOpt[ChannelListResponse]
   }
 
   /**
@@ -109,6 +106,6 @@ class Channels(httpClient: HttpClient, apiToken: String) {
 
     val responseDict = httpClient.get("channels.setTopic", cleanedParams)
 
-    responseDict.extractOpt[ChannelSetTopicResponse]
+    responseDict.camelizeKeys.extractOpt[ChannelSetTopicResponse]
   }
 }

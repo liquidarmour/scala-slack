@@ -40,10 +40,8 @@ class IM(httpClient: HttpClient, apiToken: String) {
     */
   def close(channel: String): Option[IMCloseResponse] = {
     val params = Map("channel" -> channel, "token" -> apiToken)
-
     val responseDict = httpClient.get("im.close", params)
-
-    responseDict.extractOpt[IMCloseResponse]
+    responseDict.camelizeKeys.extractOpt[IMCloseResponse]
   }
 
   /**
@@ -58,10 +56,8 @@ class IM(httpClient: HttpClient, apiToken: String) {
     */
   def history(channel: String, params: Map[String, String] = Map()): Option[ChannelHistoryResponse] = {
     val cleanedParams = params +("channel" -> channel, "token" -> apiToken)
-
     val responseDict = httpClient.get("im.history", cleanedParams)
-
-    responseDict.extractOpt[ChannelHistoryResponse]
+    responseDict.camelizeKeys.extractOpt[ChannelHistoryResponse]
   }
 
   /**
@@ -100,10 +96,8 @@ class IM(httpClient: HttpClient, apiToken: String) {
     */
   def list(): Option[IMListResponse] = {
     val params = Map("token" -> apiToken)
-
     val responseDict = httpClient.get("im.list", params)
-
-    responseDict.extractOpt[IMListResponse]
+    responseDict.camelizeKeys.extractOpt[IMListResponse]
   }
 
   /**
@@ -115,10 +109,8 @@ class IM(httpClient: HttpClient, apiToken: String) {
     */
   def mark(channel: String, ts: String): Option[IMMarkResponse] = {
     val params = Map("channel" -> channel, "ts" -> ts, "token" -> apiToken)
-
     val responseDict = httpClient.get("im.mark", params)
-
-    responseDict.extractOpt[IMMarkResponse]
+    responseDict.camelizeKeys.extractOpt[IMMarkResponse]
   }
 
   /**
@@ -132,7 +124,7 @@ class IM(httpClient: HttpClient, apiToken: String) {
 
     val responseDict = httpClient.get("im.open", params)
 
-    responseDict.extractOpt[IMOpenResponse]
+    responseDict.camelizeKeys.extractOpt[IMOpenResponse]
   }
 
 }
