@@ -1,4 +1,5 @@
 # scala-slack
+[![Build Status](https://travis-ci.org/ponkotuy/scala-slack.svg?branch=master)](https://travis-ci.org/ponkotuy/scala-slack)
 
 scala-slack is a simple, extensible client library for Scala that provides an interface to the [Slack](http://slack.com) API.
 
@@ -108,4 +109,3 @@ That being said, we hope that if you implement additional API methods yourself, 
 ## License
 
 This project is licensed under the [MIT license](http://opensource.org/licenses/MIT).
-
