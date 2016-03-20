@@ -35,8 +35,8 @@ class ChatSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAf
   private val testMessage = "This is a test."
   private val testUpdateMessage = "This is an update."
 
-  private var mockHttpClient : HttpClient = _
-  var chat : Chat = _
+  private var mockHttpClient: HttpClient = _
+  var chat: Chat = _
 
   override def beforeEach() {
     mockHttpClient = mock[HttpClient]

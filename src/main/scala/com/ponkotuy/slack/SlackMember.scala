@@ -34,8 +34,8 @@ case class SlackMember(
     deleted: Boolean,
     color: Option[String],
     profile: Map[String, JValue],
-    is_admin: Option[Boolean],
-    is_owner: Option[Boolean],
-    has_2fa: Option[Boolean],
-    has_files: Option[Boolean]
+    isAdmin: Option[Boolean],
+    isOwner: Option[Boolean],
+    has2fa: Option[Boolean],
+    hasFiles: Option[Boolean]
 )
