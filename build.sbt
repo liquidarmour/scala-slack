@@ -27,12 +27,12 @@ pomIncludeRepository := { _ => false }
 
 licenses := Seq("MIT" -> url("http://opensource.org/licenses/MIT"))
 
-homepage := Some(url("https://github.com/flyberry-capital/scala-slack"))
+homepage := Some(url("https://github.com/ponkotuy/scala-slack"))
 
 pomExtra := (
    <scm>
-      <url>git@github.com:flyberry-capital/scala-slack.git</url>
-      <connection>git@github.com:flyberry-capital/scala-slack.git</connection>
+      <url>git@github.com:ponkotuy/scala-slack.git</url>
+      <connection>git@github.com:ponkotuy/scala-slack.git</connection>
    </scm>
       <developers>
          <developer>

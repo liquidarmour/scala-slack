@@ -27,7 +27,7 @@ is subject to frequent change._
 
 scala-slack is listed on Maven Central and can be included in your project by adding this line to your build.sbt:
 ```
-libraryDependencies += "com.flyberrycapital" %% "scala-slack" % "0.3.0"
+libraryDependencies += "com.ponkotuy" %% "scala-slack" % "0.4.0"
 ```
 scala-slack support only Scala 2.11.
 
