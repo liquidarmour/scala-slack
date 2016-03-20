@@ -23,7 +23,7 @@
 package com.ponkotuy.slack.methods
 
 import com.ponkotuy.slack.HttpClient
-import com.ponkotuy.slack.responses.{UserInfoResponse, UserListResponse}
+import com.ponkotuy.slack.responses._
 import org.json4s.DefaultFormats
 
 
@@ -31,7 +31,7 @@ import org.json4s.DefaultFormats
   * The container for Slack's 'users' methods (https://api.slack.com/methods).
   */
 class Users(httpClient: HttpClient, apiToken: String) {
-  implicit val format = DefaultFormats
+  implicit val format = DefaultFormats + new PresenceSerializer
 
   /**
     * https://api.slack.com/methods/users.info
@@ -49,5 +49,11 @@ class Users(httpClient: HttpClient, apiToken: String) {
     val cleanedParams = params + ("token" -> apiToken)
     val responseDict = httpClient.get("users.list", cleanedParams)
     responseDict.camelizeKeys.extract[UserListResponse]
+  }
+
+  def getPresence(user: String): UserPresenceResponse = {
+    val params = Map("token" -> apiToken, "user" -> user)
+    val response = httpClient.get("users.getPresence", params)
+    response.camelizeKeys.extract[UserPresenceResponse]
   }
 }

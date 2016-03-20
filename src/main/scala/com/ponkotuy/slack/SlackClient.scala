@@ -20,9 +20,7 @@
  * THE SOFTWARE.
  */
 
-package com.ponkotuy.slack.responses
-
-import com.ponkotuy.slack.HttpClient
+package com.ponkotuy.slack
 
 /**
  * A simple Scala client for Slack (http://slack.com/).

@@ -23,6 +23,10 @@
 package com.ponkotuy.slack.methods
 
 import com.ponkotuy.slack.HttpClient
+import com.ponkotuy.slack.responses.{Presence, PresenceSerializer}
+import org.json4s.DefaultFormats
+import org.json4s.JsonAST.JString
+import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -38,6 +42,7 @@ class UsersSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndA
     mockHttpClient = mock[HttpClient]
     setInfoMock()
     setListMock()
+    setGetPresenceMock()
     users = new Users(mockHttpClient, testApiKey)
   }
 
@@ -108,6 +113,11 @@ class UsersSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndA
     when(mockHttpClient.get("users.list", Map("token" -> testApiKey))).thenReturn(json)
   }
 
+  private[this] def setGetPresenceMock(): Unit = {
+    val json = ("ok" -> true) ~ ("presence" -> "active")
+    when(mockHttpClient.get("users.getPresence", Map("user" -> "hoge" ,"token" -> testApiKey))).thenReturn(json)
+  }
+
   "Users.info(user)" should "get slack member from user id" in {
     val user = "U023BECGF"
     val response = users.info(user)
@@ -128,5 +138,11 @@ class UsersSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndA
     member.isOwner shouldBe Some(true)
     member.has2fa shouldBe Some(false)
     member.profile.size shouldBe 11
+  }
+
+  "Users.getPresence" should "get slack member presence" in {
+    val response = users.getPresence("hoge")
+    response.ok shouldBe true
+    response.presence shouldBe Presence.Active
   }
 }
