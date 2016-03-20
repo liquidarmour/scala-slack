@@ -64,7 +64,7 @@ class ChatSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAf
   }
 
   "Chat.delete()" should "delete a message when given a channel and timestamp" in {
-    val response = chat.delete(testChannel, testTs).get
+    val response = chat.delete(testChannel, testTs)
 
     response.ok shouldBe true
     response.channel shouldBe testChannel
@@ -74,8 +74,8 @@ class ChatSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAf
   }
 
   "Chat.delete()" should "delete a message when given a response object" in {
-    val messageResponse = chat.postMessage(testChannel, testMessage).get
-    val response = chat.delete(messageResponse).get
+    val messageResponse = chat.postMessage(testChannel, testMessage)
+    val response = chat.delete(messageResponse)
 
     response.ok shouldBe true
     response.channel shouldBe testChannel
@@ -85,7 +85,7 @@ class ChatSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAf
   }
 
   "Chat.postMessage()" should "post a new message" in {
-    val response = chat.postMessage(testChannel, testMessage).get
+    val response = chat.postMessage(testChannel, testMessage)
 
     response.ok shouldBe true
     response.ts shouldBe testTs
@@ -95,7 +95,7 @@ class ChatSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAf
   }
 
   "Chat.update()" should "update a message when given a channel, timestamp, and update text" in {
-     val response = chat.update(testChannel, testTs, testUpdateMessage).get
+     val response = chat.update(testChannel, testTs, testUpdateMessage)
 
     response.ok shouldBe true
     response.channel shouldBe testChannel
@@ -113,8 +113,8 @@ class ChatSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAf
   }
 
   "Chat.update()" should "update a message when given a response object and update text" in {
-    val messageResponse = chat.postMessage(testChannel, testMessage).get
-    val response = chat.update(messageResponse, testUpdateMessage).get
+    val messageResponse = chat.postMessage(testChannel, testMessage)
+    val response = chat.update(messageResponse, testUpdateMessage)
 
     response.ok shouldBe true
     response.channel shouldBe testChannel

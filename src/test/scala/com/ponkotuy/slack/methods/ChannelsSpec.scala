@@ -127,7 +127,7 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
    }
 
   "Channels.history()" should "make a call to channels.history and return the response in an ChannelHistoryResponse object" in {
-    val response = channels.history("C12345").get
+    val response = channels.history("C12345")
 
     response.ok shouldBe true
     response.hasMore shouldBe true
@@ -153,7 +153,7 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
   }
 
   "Channels.list()" should "list all channels available to a user" in {
-    val response = channels.list().get
+    val response = channels.list()
 
     response.ok shouldBe true
     response.channels should have length 3
@@ -173,7 +173,7 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
   }
 
   "Channels.setTopic()" should "make a call to channels.setTopic and return the response in an ChannelSetTopicResponse object" in {
-    val response = channels.setTopic("C12345", "Test Topic").get
+    val response = channels.setTopic("C12345", "Test Topic")
 
     response.ok shouldBe true
     response.topic shouldBe "Test Topic"

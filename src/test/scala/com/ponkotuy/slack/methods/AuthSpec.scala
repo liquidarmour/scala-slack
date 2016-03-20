@@ -51,7 +51,7 @@ class AuthSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAf
 
   "Auth.test()" should
       "make a call to auth.test and return the response in an AuthTestResponse object" in {
-    val response = auth.test().get
+    val response = auth.test()
 
     response.ok shouldBe true
     response.url shouldBe "test.slack.com"

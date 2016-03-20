@@ -38,9 +38,9 @@ class Auth(httpClient: HttpClient, apiToken: String) {
     *
     * @return AuthTestResponse object
     */
-  def test(): Option[AuthTestResponse] = {
+  def test(): AuthTestResponse = {
     val params = Map("token" -> apiToken)
     val responseDict = httpClient.get("auth.test", params)
-    responseDict.camelizeKeys.extractOpt[AuthTestResponse]
+    responseDict.camelizeKeys.extract[AuthTestResponse]
   }
 }

@@ -36,18 +36,18 @@ class Users(httpClient: HttpClient, apiToken: String) {
   /**
     * https://api.slack.com/methods/users.info
     */
-  def info(user: String): Option[UserInfoResponse] = {
+  def info(user: String): UserInfoResponse = {
     val params = Map("token" -> apiToken, "user" -> user)
     val response = httpClient.get("users.info", params)
-    response.camelizeKeys.extractOpt[UserInfoResponse]
+    response.camelizeKeys.extract[UserInfoResponse]
   }
 
   /**
     * https://api.slack.com/methods/users.list
     */
-  def list(params: Map[String, String] = Map()): Option[UserListResponse] = {
+  def list(params: Map[String, String] = Map()): UserListResponse = {
     val cleanedParams = params + ("token" -> apiToken)
     val responseDict = httpClient.get("users.list", cleanedParams)
-    responseDict.camelizeKeys.extractOpt[UserListResponse]
+    responseDict.camelizeKeys.extract[UserListResponse]
   }
 }

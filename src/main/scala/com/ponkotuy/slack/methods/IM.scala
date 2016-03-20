@@ -37,10 +37,10 @@ class IM(httpClient: HttpClient, apiToken: String) {
     * @param channel The channel ID for the direct message history to close.
     * @return IMCloseResponse
     */
-  def close(channel: String): Option[IMCloseResponse] = {
+  def close(channel: String): IMCloseResponse = {
     val params = Map("channel" -> channel, "token" -> apiToken)
     val responseDict = httpClient.get("im.close", params)
-    responseDict.camelizeKeys.extractOpt[IMCloseResponse]
+    responseDict.camelizeKeys.extract[IMCloseResponse]
   }
 
   /**
@@ -53,10 +53,10 @@ class IM(httpClient: HttpClient, apiToken: String) {
     * @param params  A map of optional parameters and their values.
     * @return ChannelHistoryResponse
     */
-  def history(channel: String, params: Map[String, String] = Map()): Option[ChannelHistoryResponse] = {
+  def history(channel: String, params: Map[String, String] = Map()): ChannelHistoryResponse = {
     val cleanedParams = params +("channel" -> channel, "token" -> apiToken)
     val responseDict = httpClient.get("im.history", cleanedParams)
-    responseDict.camelizeKeys.extractOpt[ChannelHistoryResponse]
+    responseDict.camelizeKeys.extract[ChannelHistoryResponse]
   }
 
   /**
@@ -70,7 +70,7 @@ class IM(httpClient: HttpClient, apiToken: String) {
   def historyStream(channel: String, params: Map[String, String] = Map()): Iterator[SlackMessage] = {
     new Iterator[SlackMessage] {
       var hist = history(channel, params = params)
-      var messages = hist.map(_.messages).getOrElse(Nil)
+      var messages = hist.messages
 
       def hasNext = messages.nonEmpty
 
@@ -78,9 +78,9 @@ class IM(httpClient: HttpClient, apiToken: String) {
         val m = messages.head
         messages = messages.tail
 
-        if (messages.isEmpty && hist.exists(_.hasMore)) {
+        if (messages.isEmpty && hist.hasMore) {
           hist = history(channel, params = params + ("latest" -> m.ts))
-          messages = hist.map(_.messages).getOrElse(Nil)
+          messages = hist.messages
         }
 
         m
@@ -93,10 +93,10 @@ class IM(httpClient: HttpClient, apiToken: String) {
     *
     * @return IMListResponse of all open IM channels
     */
-  def list(): Option[IMListResponse] = {
+  def list(): IMListResponse = {
     val params = Map("token" -> apiToken)
     val responseDict = httpClient.get("im.list", params)
-    responseDict.camelizeKeys.extractOpt[IMListResponse]
+    responseDict.camelizeKeys.extract[IMListResponse]
   }
 
   /**
@@ -106,10 +106,10 @@ class IM(httpClient: HttpClient, apiToken: String) {
     * @param ts Timestamp of the most recently seen message.
     * @return IMMarkResponse
     */
-  def mark(channel: String, ts: String): Option[IMMarkResponse] = {
+  def mark(channel: String, ts: String): IMMarkResponse = {
     val params = Map("channel" -> channel, "ts" -> ts, "token" -> apiToken)
     val responseDict = httpClient.get("im.mark", params)
-    responseDict.camelizeKeys.extractOpt[IMMarkResponse]
+    responseDict.camelizeKeys.extract[IMMarkResponse]
   }
 
   /**
@@ -118,12 +118,11 @@ class IM(httpClient: HttpClient, apiToken: String) {
     * @param user The user ID for the user to open a direct message channel with.
     * @return IMOpenResponse
     */
-  def open(user: String): Option[IMOpenResponse] = {
+  def open(user: String): IMOpenResponse = {
     val params = Map("user" -> user, "token" -> apiToken)
 
     val responseDict = httpClient.get("im.open", params)
 
-    responseDict.camelizeKeys.extractOpt[IMOpenResponse]
+    responseDict.camelizeKeys.extract[IMOpenResponse]
   }
-
 }

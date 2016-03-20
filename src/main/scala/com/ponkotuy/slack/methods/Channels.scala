@@ -42,10 +42,10 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     * @param params  A map of optional parameters and their values.
     * @return ChannelHistoryResponse
     */
-  def history(channel: String, params: Map[String, String] = Map()): Option[ChannelHistoryResponse] = {
+  def history(channel: String, params: Map[String, String] = Map()): ChannelHistoryResponse = {
     val cleanedParams = params +("channel" -> channel, "token" -> apiToken)
     val responseDict = httpClient.get("channels.history", cleanedParams)
-    responseDict.camelizeKeys.extractOpt[ChannelHistoryResponse]
+    responseDict.camelizeKeys.extract[ChannelHistoryResponse]
   }
 
   /**
@@ -59,7 +59,7 @@ class Channels(httpClient: HttpClient, apiToken: String) {
   def historyStream(channel: String, params: Map[String, String] = Map()): Iterator[SlackMessage] = {
     new Iterator[SlackMessage] {
       var hist = history(channel, params = params)
-      var messages = hist.map(_.messages).getOrElse(Nil)
+      var messages = hist.messages
 
       def hasNext = messages.nonEmpty
 
@@ -67,9 +67,9 @@ class Channels(httpClient: HttpClient, apiToken: String) {
         val m = messages.head
         messages = messages.tail
 
-        if (messages.isEmpty && hist.exists(_.hasMore)) {
+        if (messages.isEmpty && hist.hasMore) {
           hist = history(channel, params = params + ("latest" -> m.ts))
-          messages = hist.map(_.messages).getOrElse(Nil)
+          messages = hist.messages
         }
         m
       }
@@ -82,13 +82,10 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     * @param params A map of optional parameters and their values.
     * @return A ChannelListResponse object.
     */
-  def list(params: Map[String, String] = Map()): Option[ChannelListResponse] = {
-
+  def list(params: Map[String, String] = Map()): ChannelListResponse = {
     val cleanedParams = params + ("token" -> apiToken)
-
     val responseDict = httpClient.get("channels.list", cleanedParams)
-
-    responseDict.camelizeKeys.extractOpt[ChannelListResponse]
+    responseDict.camelizeKeys.extract[ChannelListResponse]
   }
 
   /**
@@ -99,12 +96,9 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     * @param params  A map of optional parameters and their values.
     * @return A ChannelSetTopicResponse object.
     */
-  def setTopic(channel: String, topic: String, params: Map[String, String] = Map()): Option[ChannelSetTopicResponse] = {
-
+  def setTopic(channel: String, topic: String, params: Map[String, String] = Map()): ChannelSetTopicResponse = {
     val cleanedParams = params +("channel" -> channel, "topic" -> topic, "token" -> apiToken)
-
     val responseDict = httpClient.get("channels.setTopic", cleanedParams)
-
-    responseDict.camelizeKeys.extractOpt[ChannelSetTopicResponse]
+    responseDict.camelizeKeys.extract[ChannelSetTopicResponse]
   }
 }

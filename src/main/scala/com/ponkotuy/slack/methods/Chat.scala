@@ -40,12 +40,10 @@ class Chat(httpClient: HttpClient, apiToken: String) {
     * @param ts      The timestamp of the message to be deleted.
     * @return PostMessageResponse object.
     */
-  def delete(channel: String, ts: String): Option[PostMessageResponse] = {
+  def delete(channel: String, ts: String): PostMessageResponse = {
     val params = Map("channel" -> channel, "ts" -> ts.toString, "token" -> apiToken)
-
     val responseDict = httpClient.post("chat.delete", params)
-
-    responseDict.extractOpt[PostMessageResponse]
+    responseDict.extract[PostMessageResponse]
   }
 
   /**
@@ -54,7 +52,7 @@ class Chat(httpClient: HttpClient, apiToken: String) {
     * @param postMessageResponse A PostMessageResponse object generated from a call to postMessage() or update().
     * @return PostMessageResponse object.
     */
-  def delete(postMessageResponse: PostMessageResponse): Option[PostMessageResponse] = {
+  def delete(postMessageResponse: PostMessageResponse): PostMessageResponse = {
     delete(postMessageResponse.channel, postMessageResponse.ts)
   }
 
@@ -66,14 +64,11 @@ class Chat(httpClient: HttpClient, apiToken: String) {
     * @param params  Optional additional params.
     * @return PostMessageResponse object.
     */
-  def postMessage(channel: String, text: String, params: Map[String, String] = Map()): Option[PostMessageResponse] = {
-
+  def postMessage(channel: String, text: String, params: Map[String, String] = Map()): PostMessageResponse = {
     val cleanedParams = params ++
         Map("channel" -> channel, "text" -> text, "token" -> apiToken)
-
     val responseDict = httpClient.post("chat.postMessage", cleanedParams)
-
-    responseDict.extractOpt[PostMessageResponse]
+    responseDict.extract[PostMessageResponse]
   }
 
   /**
@@ -84,12 +79,12 @@ class Chat(httpClient: HttpClient, apiToken: String) {
     * @param text    The updated text for the message.
     * @return PostMessageResponse object.
     */
-  def update(channel: String, ts: String, text: String): Option[PostMessageResponse] = {
+  def update(channel: String, ts: String, text: String): PostMessageResponse = {
     val params = Map("channel" -> channel, "ts" -> ts.toString, "token" -> apiToken, "text" -> text)
 
     val responseDict = httpClient.post("chat.update", params)
 
-    responseDict.extractOpt[PostMessageResponse]
+    responseDict.extract[PostMessageResponse]
   }
 
   /**
@@ -99,7 +94,7 @@ class Chat(httpClient: HttpClient, apiToken: String) {
     * @param text                The updated text for the message.
     * @return PostMessageResponse object.
     */
-  def update(postMessageResponse: PostMessageResponse, text: String): Option[PostMessageResponse] = {
+  def update(postMessageResponse: PostMessageResponse, text: String): PostMessageResponse = {
     update(postMessageResponse.channel, postMessageResponse.ts, text)
   }
 

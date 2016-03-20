@@ -110,14 +110,14 @@ class UsersSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndA
 
   "Users.info(user)" should "get slack member from user id" in {
     val user = "U023BECGF"
-    val response = users.info(user).get
+    val response = users.info(user)
     response.ok shouldBe true
     response.user.id shouldBe user
     response.user.deleted shouldBe false
   }
 
   "Users.list()" should "get slack members" in {
-    val response = users.list().get
+    val response = users.list()
     response.ok shouldBe true
     response.members.nonEmpty shouldBe true
 
