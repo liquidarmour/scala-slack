@@ -19,7 +19,8 @@
  */
 package com.ponkotuy.slack.methods
 
-import com.ponkotuy.slack.{HttpClient, SlackMessage}
+import com.ponkotuy.slack.HttpClient
+import com.ponkotuy.slack.responses._
 import org.json4s.DefaultFormats
 
 /**
@@ -28,8 +29,6 @@ import org.json4s.DefaultFormats
  * <i>Note: This is a partial implementation, and some (i.e. most) methods are unimplemented.</i>
  */
 class IM(httpClient: HttpClient, apiToken: String) {
-  import com.ponkotuy.slack.Responses._
-
   implicit val default = DefaultFormats
 
   /**

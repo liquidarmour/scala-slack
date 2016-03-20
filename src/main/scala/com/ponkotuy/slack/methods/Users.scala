@@ -23,7 +23,7 @@
 package com.ponkotuy.slack.methods
 
 import com.ponkotuy.slack.HttpClient
-import com.ponkotuy.slack.Responses.UserInfoResponse
+import com.ponkotuy.slack.responses.{UserInfoResponse, UserListResponse}
 import org.json4s.DefaultFormats
 
 
@@ -31,8 +31,6 @@ import org.json4s.DefaultFormats
   * The container for Slack's 'users' methods (https://api.slack.com/methods).
   */
 class Users(httpClient: HttpClient, apiToken: String) {
-  import com.ponkotuy.slack.Responses.UserListResponse
-
   implicit val format = DefaultFormats
 
   /**

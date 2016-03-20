@@ -23,6 +23,7 @@
 package com.ponkotuy.slack.methods
 
 import com.ponkotuy.slack.HttpClient
+import com.ponkotuy.slack.responses.PostMessageResponse
 import org.json4s.DefaultFormats
 
 
@@ -30,8 +31,6 @@ import org.json4s.DefaultFormats
  * The container for Slack's 'chat' methods (https://api.slack.com/methods).
  */
 class Chat(httpClient: HttpClient, apiToken: String) {
-  import com.ponkotuy.slack.Responses._
-
   implicit val format = DefaultFormats
 
   /**

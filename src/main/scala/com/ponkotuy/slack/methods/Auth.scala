@@ -23,6 +23,7 @@
 package com.ponkotuy.slack.methods
 
 import com.ponkotuy.slack.HttpClient
+import com.ponkotuy.slack.responses.AuthTestResponse
 import org.json4s.DefaultFormats
 
 
@@ -30,8 +31,6 @@ import org.json4s.DefaultFormats
  * The container for Slack's 'auth' methods (https://api.slack.com/methods).
  */
 class Auth(httpClient: HttpClient, apiToken: String) {
-  import com.ponkotuy.slack.Responses._
-
   implicit val formats = DefaultFormats
 
   /**

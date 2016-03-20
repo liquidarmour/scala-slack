@@ -23,7 +23,6 @@
 package com.ponkotuy.slack.methods
 
 import com.ponkotuy.slack.HttpClient
-import com.ponkotuy.slack.methods.Channels
 import org.json4s.JsonDSL._
 import org.json4s._
 import org.mockito.Mockito._

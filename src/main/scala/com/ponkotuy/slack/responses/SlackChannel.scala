@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package com.ponkotuy.slack
+package com.ponkotuy.slack.responses
 
 import org.json4s.JValue
 

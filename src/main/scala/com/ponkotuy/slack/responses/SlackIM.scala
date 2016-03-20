@@ -1,5 +1,4 @@
 /*
- * Copyright (c) 2014 Flyberry Capital, LLC
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +19,14 @@
  * THE SOFTWARE.
  */
 
-package com.ponkotuy.slack
-
-import org.json4s.JValue
-
+package com.ponkotuy.slack.responses
 
 /**
-  * Class for representing a Slack member
-  */
-case class SlackMember(
-    id: String,
-    name: String,
-    deleted: Boolean,
-    color: Option[String],
-    profile: Map[String, JValue],
-    isAdmin: Option[Boolean],
-    isOwner: Option[Boolean],
-    has2fa: Option[Boolean],
-    hasFiles: Option[Boolean]
-)
+ * Class for representing a Slack IM channel.
+ *
+ * @param id The IM channel ID.
+ * @param user The user ID of the "calling user"
+ * @param created A UNIX timestamp corresponding to the IM creation data/time.
+ * @param isUserDeleted Denotes if the other user's account has been disabled.
+ */
+case class SlackIM(id: String, isIm: Boolean, user: String, created: Long, isUserDeleted: Boolean)
