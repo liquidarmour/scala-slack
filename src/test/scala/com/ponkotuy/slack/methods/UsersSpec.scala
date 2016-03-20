@@ -36,8 +36,42 @@ class UsersSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndA
 
   override def beforeEach(): Unit = {
     mockHttpClient = mock[HttpClient]
+    setInfoMock()
     setListMock()
     users = new Users(mockHttpClient, testApiKey)
+  }
+
+  private[this] def setInfoMock(): Unit = {
+    val json = parse(
+      """
+        |{
+        |    "ok": true,
+        |    "user": {
+        |        "id": "U023BECGF",
+        |        "name": "bobby",
+        |        "deleted": false,
+        |        "color": "9f69e7",
+        |        "profile": {
+        |            "first_name": "Bobby",
+        |            "last_name": "Tables",
+        |            "real_name": "Bobby Tables",
+        |            "email": "bobby@slack.com",
+        |            "skype": "my-skype-name",
+        |            "phone": "+1 (123) 456 7890",
+        |            "image_24": "https:\/\/...",
+        |            "image_32": "https:\/\/...",
+        |            "image_48": "https:\/\/...",
+        |            "image_72": "https:\/\/...",
+        |            "image_192": "https:\/\/..."
+        |        },
+        |        "is_admin": true,
+        |        "is_owner": true,
+        |        "has_2fa": true,
+        |        "has_files": true
+        |    }
+        |}
+      """.stripMargin)
+    when(mockHttpClient.get("users.info", Map("user" -> "U023BECGF", "token" -> testApiKey))).thenReturn(json)
   }
 
   private[this] def setListMock(): Unit = {
@@ -73,6 +107,15 @@ class UsersSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndA
       """.stripMargin)
     when(mockHttpClient.get("users.list", Map("token" -> testApiKey))).thenReturn(json)
   }
+
+  "Users.info(user)" should "get slack member from user id" in {
+    val user = "U023BECGF"
+    val response = users.info(user).get
+    response.ok shouldBe true
+    response.user.id shouldBe user
+    response.user.deleted shouldBe false
+  }
+
   "Users.list()" should "get slack members" in {
     val response = users.list().get
     response.ok shouldBe true
@@ -84,5 +127,6 @@ class UsersSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndA
     member.isAdmin shouldBe Some(true)
     member.isOwner shouldBe Some(true)
     member.has2fa shouldBe Some(false)
+    member.profile.size shouldBe 11
   }
 }

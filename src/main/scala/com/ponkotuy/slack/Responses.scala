@@ -47,4 +47,5 @@ object Responses {
   case class IMHistoryResponse(ok: Boolean, messages: List[SlackMessage],
       hasMore: Boolean, isLimited: Boolean)
   case class UserListResponse(ok: Boolean, members: List[SlackMember])
+  case class UserInfoResponse(ok: Boolean, user: SlackMember)
 }

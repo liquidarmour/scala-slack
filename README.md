@@ -21,6 +21,7 @@ is subject to frequent change._
  - im.list
  - im.mark
  - im.open
+ - users.info
  - users.list
 
 ## Download
