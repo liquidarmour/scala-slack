@@ -33,7 +33,7 @@ class SlackClient(private val apiToken: String) {
 
    protected val httpClient = new HttpClient()
 
-   import com.ponkotuy.slack.Methods._
+   import com.ponkotuy.slack.methods._
 
    val api = new API(httpClient, apiToken)
    val auth = new Auth(httpClient, apiToken)

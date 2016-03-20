@@ -1,8 +1,9 @@
+package com.ponkotuy.slack
+
 import com.ponkotuy.slack.Exceptions._
-import com.ponkotuy.slack.HttpClient
-import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers, PrivateMethodTester}
-import org.json4s._
 import org.json4s.JsonDSL._
+import org.json4s._
+import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers, PrivateMethodTester}
 
 /*
  * Copyright (c) 2014 Flyberry Capital, LLC

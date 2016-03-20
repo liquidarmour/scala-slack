@@ -20,12 +20,13 @@
  * THE SOFTWARE.
  */
 
+package com.ponkotuy.slack.methods
+
 import com.ponkotuy.slack.HttpClient
-import com.ponkotuy.slack.Methods.Chat
+import org.json4s.JsonDSL._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
-import org.json4s.JsonDSL._
 
 class ChatSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAfterEach {
   private val testApiKey = "TEST_API_KEY"

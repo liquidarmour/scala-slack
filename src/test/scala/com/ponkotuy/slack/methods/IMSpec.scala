@@ -19,10 +19,11 @@
  * THE SOFTWARE.
  */
 
+package com.ponkotuy.slack.methods
+
 import com.ponkotuy.slack.HttpClient
-import com.ponkotuy.slack.Methods.IM
-import org.json4s._
 import org.json4s.JsonDSL._
+import org.json4s._
 import org.json4s.native.JsonMethods._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar

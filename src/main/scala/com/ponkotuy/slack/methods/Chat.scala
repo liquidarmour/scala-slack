@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package com.ponkotuy.slack.Methods
+package com.ponkotuy.slack.methods
 
 import com.ponkotuy.slack.HttpClient
 import org.json4s.DefaultFormats

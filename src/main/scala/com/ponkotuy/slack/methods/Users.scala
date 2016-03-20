@@ -20,28 +20,26 @@
  * THE SOFTWARE.
  */
 
-package com.ponkotuy.slack.Methods
+package com.ponkotuy.slack.methods
 
 import com.ponkotuy.slack.HttpClient
 import org.json4s.DefaultFormats
 
 
 /**
- * The container for Slack's 'auth' methods (https://api.slack.com/methods).
- */
-class Auth(httpClient: HttpClient, apiToken: String) {
-  import com.ponkotuy.slack.Responses._
+  * The container for Slack's 'users' methods (https://api.slack.com/methods).
+  */
+class Users(httpClient: HttpClient, apiToken: String) {
+  import com.ponkotuy.slack.Responses.UserListResponse
 
-  implicit val formats = DefaultFormats
+  implicit val format = DefaultFormats
 
   /**
-    * See: https://api.slack.com/methods/auth.test
-    *
-    * @return AuthTestResponse object
+    * https://api.slack.com/methods/users.list
     */
-  def test(): Option[AuthTestResponse] = {
-    val params = Map("token" -> apiToken)
-    val responseDict = httpClient.get("auth.test", params)
-    responseDict.camelizeKeys.extractOpt[AuthTestResponse]
+  def list(params: Map[String, String] = Map()): Option[UserListResponse] = {
+    val cleanedParams = params + ("token" -> apiToken)
+    val responseDict = httpClient.get("users.list", cleanedParams)
+    responseDict.camelizeKeys.extractOpt[UserListResponse]
   }
 }

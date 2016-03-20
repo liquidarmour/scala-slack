@@ -17,7 +17,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.ponkotuy.slack.Methods
+package com.ponkotuy.slack.methods
 
 import com.ponkotuy.slack.{HttpClient, SlackMessage}
 import org.json4s.DefaultFormats
@@ -48,7 +48,7 @@ class IM(httpClient: HttpClient, apiToken: String) {
     * https://api.slack.com/methods/im.history
     *
     * The format is exactly the same as channels.history, with the exception that we call im.history.
-    * Code copied from [[com.ponkotuy.slack.Methods.Channels]]
+    * Code copied from [[com.ponkotuy.slack.methods.Channels]]
     *
     * @param channel The channel ID of the IM to get history for.
     * @param params  A map of optional parameters and their values.

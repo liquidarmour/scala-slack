@@ -20,12 +20,13 @@
  * THE SOFTWARE.
  */
 
+package com.ponkotuy.slack.methods
+
 import com.ponkotuy.slack.HttpClient
-import com.ponkotuy.slack.Methods.Auth
-import org.scalatest.mock.MockitoSugar
-import org.mockito.Mockito._
-import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
 import org.json4s.JsonDSL._
+import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
+import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
 
 class AuthSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAfterEach {
 

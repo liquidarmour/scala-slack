@@ -1,11 +1,3 @@
-import com.ponkotuy.slack.HttpClient
-import com.ponkotuy.slack.Methods.Channels
-import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
-import org.json4s._
-import org.json4s.JsonDSL._
-
 /*
  * Copyright (c) 2014 Flyberry Capital, LLC
  *
@@ -27,6 +19,16 @@ import org.json4s.JsonDSL._
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+package com.ponkotuy.slack.methods
+
+import com.ponkotuy.slack.HttpClient
+import com.ponkotuy.slack.methods.Channels
+import org.json4s.JsonDSL._
+import org.json4s._
+import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
+import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
 
 class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndAfterEach {
 
