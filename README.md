@@ -77,7 +77,7 @@ scala-slack can easily be extended to accommodate new API methods and functional
 For example, if Slack adds a chat.poke method, one could write a new version of the Chat class:
 ```scala
 import com.ponkotuy.slack.HttpClient
-import com.ponkotuy.slack.Methods.Chat
+import com.ponkotuy.slack.methods.Chat
 
 class PokeChat(httpClient: HttpClient, apiToken: String) extends Chat(httpClient, apiToken) {
 
