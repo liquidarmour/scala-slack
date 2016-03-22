@@ -51,9 +51,21 @@ class Users(httpClient: HttpClient, apiToken: String) {
     responseDict.camelizeKeys.extract[UserListResponse]
   }
 
+  /**
+    * https://api.slack.com/methods/users.getPresence
+    */
   def getPresence(user: String): UserPresenceResponse = {
     val params = Map("token" -> apiToken, "user" -> user)
     val response = httpClient.get("users.getPresence", params)
     response.camelizeKeys.extract[UserPresenceResponse]
+  }
+
+  /**
+    * https://api.slack.com/methods/users.setActive
+    */
+  def setActive(): Boolean = {
+    val params = Map("token" -> apiToken)
+    val response = httpClient.get("users.setActive", params)
+    (response \ "ok").extract[Boolean]
   }
 }

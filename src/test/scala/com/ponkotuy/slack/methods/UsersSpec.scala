@@ -23,9 +23,8 @@
 package com.ponkotuy.slack.methods
 
 import com.ponkotuy.slack.HttpClient
-import com.ponkotuy.slack.responses.{Presence, PresenceSerializer}
-import org.json4s.DefaultFormats
-import org.json4s.JsonAST.JString
+import com.ponkotuy.slack.responses.Presence
+import org.json4s.JObject
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.mockito.Mockito._
@@ -43,6 +42,7 @@ class UsersSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndA
     setInfoMock()
     setListMock()
     setGetPresenceMock()
+    setSetActiveMock()
     users = new Users(mockHttpClient, testApiKey)
   }
 
@@ -118,6 +118,10 @@ class UsersSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndA
     when(mockHttpClient.get("users.getPresence", Map("user" -> "hoge" ,"token" -> testApiKey))).thenReturn(json)
   }
 
+  private[this] def setSetActiveMock(): Unit = {
+    when(mockHttpClient.get("users.setActive", Map("token" -> testApiKey))).thenReturn("ok" -> true: JObject)
+  }
+
   "Users.info(user)" should "get slack member from user id" in {
     val user = "U023BECGF"
     val response = users.info(user)
@@ -144,5 +148,10 @@ class UsersSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndA
     val response = users.getPresence("hoge")
     response.ok shouldBe true
     response.presence shouldBe Presence.Active
+  }
+
+  "Users.setActive" should "set active to login user" in {
+    val response = users.setActive()
+    response shouldBe true
   }
 }
