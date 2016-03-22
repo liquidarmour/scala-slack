@@ -37,8 +37,8 @@ class HttpClient(BaseURL: String = "https://slack.com/api") {
 
   implicit val formats = DefaultFormats
 
-  private[this] var connTimeoutMs: Int = 100
-  private[this] var readTimeoutMs: Int = 500
+  private[this] var connTimeoutMs: Int = 1000
+  private[this] var readTimeoutMs: Int = 5000
 
   @inline private def buildURL(method: String) = s"$BaseURL/$method"
 
