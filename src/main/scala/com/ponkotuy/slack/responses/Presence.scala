@@ -7,8 +7,9 @@ sealed abstract class Presence(val value: String)
 object Presence {
   case object Active extends Presence("active")
   case object Away extends Presence("away")
+  case object Auto extends Presence("auto")
 
-  val values = Vector(Active, Away)
+  val values = Vector(Active, Away, Auto)
   def findName(name: String): Option[Presence] = values.find(_.value == name)
 }
 

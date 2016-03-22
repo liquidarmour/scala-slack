@@ -68,4 +68,13 @@ class Users(httpClient: HttpClient, apiToken: String) {
     val response = httpClient.get("users.setActive", params)
     (response \ "ok").extract[Boolean]
   }
+
+  /**
+    * https://api.slack.com/methods/users.setPresence
+    */
+  def setPresence(presence: Presence): Boolean = {
+    val params = Map("token" -> apiToken, "presence" -> presence.value)
+    val response = httpClient.get("users.setPresence", params)
+    (response \ "ok").extract[Boolean]
+  }
 }

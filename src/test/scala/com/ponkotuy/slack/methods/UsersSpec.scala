@@ -43,8 +43,11 @@ class UsersSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndA
     setListMock()
     setGetPresenceMock()
     setSetActiveMock()
+    setSetPresenceMock()
     users = new Users(mockHttpClient, testApiKey)
   }
+
+  def success: JObject = "ok" -> true
 
   private[this] def setInfoMock(): Unit = {
     val json = parse(
@@ -119,7 +122,11 @@ class UsersSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndA
   }
 
   private[this] def setSetActiveMock(): Unit = {
-    when(mockHttpClient.get("users.setActive", Map("token" -> testApiKey))).thenReturn("ok" -> true: JObject)
+    when(mockHttpClient.get("users.setActive", Map("token" -> testApiKey))).thenReturn(success)
+  }
+
+  private[this] def setSetPresenceMock(): Unit = {
+    when(mockHttpClient.get("users.setPresence", Map("presence" -> "away", "token" -> testApiKey))).thenReturn(success)
   }
 
   "Users.info(user)" should "get slack member from user id" in {
@@ -151,7 +158,10 @@ class UsersSpec extends FlatSpec with MockitoSugar with Matchers with BeforeAndA
   }
 
   "Users.setActive" should "set active to login user" in {
-    val response = users.setActive()
-    response shouldBe true
+    users.setActive() shouldBe true
+  }
+
+  "Users.setPresence" should "set presence to login user" in {
+    users.setPresence(Presence.Away) shouldBe true
   }
 }
