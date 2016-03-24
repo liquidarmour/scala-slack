@@ -3,7 +3,7 @@ name := "scala-slack"
 
 organization := "com.ponkotuy"
 
-version := "0.4.0"
+version := "0.4.1-SNAPSHOT"
 
 scalacOptions += "-target:jvm-1.6"
 

@@ -23,6 +23,9 @@ is subject to frequent change._
  - im.open
  - users.info
  - users.list
+ - users.getPresence
+ - users.setActive
+ - users.setPresence
 
 ## Download
 
