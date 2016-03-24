@@ -3,7 +3,7 @@ name := "scala-slack"
 
 organization := "com.ponkotuy"
 
-version := "0.4.0-SNAPSHOT"
+version := "0.4.0"
 
 scalacOptions += "-target:jvm-1.6"
 
@@ -30,17 +30,17 @@ licenses := Seq("MIT" -> url("http://opensource.org/licenses/MIT"))
 homepage := Some(url("https://github.com/ponkotuy/scala-slack"))
 
 pomExtra := (
-   <scm>
-      <url>git@github.com:ponkotuy/scala-slack.git</url>
-      <connection>git@github.com:ponkotuy/scala-slack.git</connection>
-   </scm>
-      <developers>
-         <developer>
-            <id>ksolan</id>
-            <name>Kyle Solan</name>
-            <url>https://github.com/ksolan</url>
-         </developer>
-      </developers>)
+  <scm>
+    <url>git@github.com:ponkotuy/scala-slack.git</url>
+    <connection>git@github.com:ponkotuy/scala-slack.git</connection>
+  </scm>
+    <developers>
+      <developer>
+        <id>ponkotuy</id>
+        <name>ponkotuy</name>
+        <url>https://github.com/ponkotuy</url>
+      </developer>
+    </developers>)
 
 
 
