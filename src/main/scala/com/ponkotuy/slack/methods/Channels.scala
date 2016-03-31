@@ -101,4 +101,12 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     val responseDict = httpClient.get("channels.setTopic", cleanedParams)
     responseDict.camelizeKeys.extract[ChannelSetTopicResponse]
   }
+
+  /**
+    * https://api.slack.com/methods/channels.archive
+    */
+  def archive(channel: String): Boolean = {
+    val response = httpClient.get("channels.archive", Map("token" -> apiToken, "channel" -> channel))
+    (response \ "ok").extract[Boolean]
+  }
 }

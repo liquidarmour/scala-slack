@@ -117,12 +117,18 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
         .thenReturn(("ok" -> true) ~ ("topic" -> "Test Topic"))
   }
 
+  private[this] def setArchiveMock(): Unit = {
+    when(mockHttpClient.get("channels.archive", Map("channel" -> "C12345", "token" -> testApiKey)))
+        .thenReturn("ok" -> true: JObject)
+  }
+
   override def beforeEach() {
     mockHttpClient = mock[HttpClient]
     setHistoryMock()
     setHistoryWIthLastestMock()
     setListMock()
     setTopicMock()
+    setArchiveMock()
     channels = new Channels(mockHttpClient, testApiKey)
    }
 
@@ -180,5 +186,9 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
 
     verify(mockHttpClient).get("channels.setTopic", Map("channel" -> "C12345", "topic" ->
         "Test Topic", "token" -> testApiKey))
+  }
+
+  "Channels.archive()" should "archive and return true if succeeded" in {
+    channels.archive("C12345") shouldBe true
   }
 }
