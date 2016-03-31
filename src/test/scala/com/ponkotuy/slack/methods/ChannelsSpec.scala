@@ -36,6 +36,8 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
   private var mockHttpClient: HttpClient = _
   var channels: Channels = _
 
+  val success: JObject = "ok" -> true
+
   private[this] def setHistoryMock(): Unit = {
     val json = ("ok" -> true) ~
         ("latest", "1358547726.000003") ~
@@ -119,7 +121,9 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
 
   private[this] def setArchiveMock(): Unit = {
     when(mockHttpClient.get("channels.archive", Map("channel" -> "C12345", "token" -> testApiKey)))
-        .thenReturn("ok" -> true: JObject)
+        .thenReturn(success)
+    when(mockHttpClient.get("channels.unarchive", Map("channel" -> "C12345", "token" -> testApiKey)))
+        .thenReturn(success)
   }
 
   override def beforeEach() {
@@ -190,5 +194,9 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
 
   "Channels.archive()" should "archive and return true if succeeded" in {
     channels.archive("C12345") shouldBe true
+  }
+
+  "Channels.unarchive()" should "unarchive and return true if succeeded" in {
+    channels.unarchive("C12345") shouldBe true
   }
 }
