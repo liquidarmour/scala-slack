@@ -35,8 +35,35 @@ import org.json4s.JValue
  * @param isMember Denotes whether the querying user is a member of this channel.
  * @param members A list of user IDs of the users in this channel.
  * @param numMembers The number of members in this channel.
- * @param topic A Play JsValue object containing topic information. Refer to Slack API documentation for possible fields.
- * @param purpose A Play JsValue object containing purpose information. Refer to Slack API documentation for possible fields.
+ * @param topic A JValue object containing topic information. Refer to Slack API documentation for possible fields.
+ * @param purpose A JValue object containing purpose information. Refer to Slack API documentation for possible fields.
  */
 case class SlackChannel(id: String, name: String, created: Long, creator: String, isArchived: Boolean, isMember: Boolean,
-                        members: List[String], numMembers: Int, topic: JValue, purpose: JValue)
+                        members: List[String], numMembers: Int, topic: JValue, purpose: JValue) extends SlackChannelBase
+
+trait SlackChannelBase {
+  def id: String
+  def name: String
+  def created: Long
+  def creator: String
+  def isArchived: Boolean
+  def isMember: Boolean
+  def members: List[String]
+}
+
+case class SlackChannelInfo(
+    id: String,
+    name: String,
+    created: Long,
+    creator: String,
+    isArchived: Boolean,
+    isMember: Boolean,
+    isGeneral: Boolean,
+    members: List[String],
+    topic: JValue,
+    purpose: JValue,
+    lastRead: Double,
+    latest: JValue,
+    unreadCount: Int,
+    unreadCountDisplay: Int
+) extends SlackChannelBase

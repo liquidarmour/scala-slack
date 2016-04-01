@@ -34,6 +34,7 @@ case class APITestResponse(ok: Boolean, args: Option[Map[String, String]])
 case class ChannelHistoryResponse(ok: Boolean, messages: List[SlackMessage], hasMore: Boolean, isLimited: Option[Boolean])
 case class ChannelListResponse(ok: Boolean, channels: List[SlackChannel])
 case class ChannelSetTopicResponse(ok: Boolean, topic: String)
+case class ChannelInfoResponse(ok: Boolean, channel: SlackChannelInfo)
 
 case class IMCloseResponse(ok: Boolean, noOp: Option[Boolean], alreadyClosed: Option[Boolean])
 case class IMMarkResponse(ok: Boolean)

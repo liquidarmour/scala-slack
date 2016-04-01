@@ -25,6 +25,7 @@ package com.ponkotuy.slack.methods
 import com.ponkotuy.slack.HttpClient
 import org.json4s.JsonDSL._
 import org.json4s._
+import org.json4s.native.JsonMethods._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
@@ -126,6 +127,38 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
         .thenReturn(success)
   }
 
+  private[this] def setInfoMock(): Unit = {
+    val json = parse(
+      """
+        |{
+        |    "ok": true,
+        |    "channel": {
+        |        "id": "C024BE91L",
+        |        "name": "fun",
+        |
+        |        "created": 1360782804,
+        |        "creator": "U024BE7LH",
+        |
+        |        "is_archived": false,
+        |        "is_general": false,
+        |        "is_member": true,
+        |
+        |        "members": [],
+        |
+        |        "topic": {},
+        |        "purpose": {},
+        |
+        |        "last_read": "1401383885.000061",
+        |        "latest": {},
+        |        "unread_count": 0,
+        |        "unread_count_display": 0
+        |    }
+        |}
+      """.stripMargin)
+    when(mockHttpClient.get("channels.info", Map("channel" -> "C024BE91L", "token" -> testApiKey)))
+        .thenReturn(json)
+  }
+
   override def beforeEach() {
     mockHttpClient = mock[HttpClient]
     setHistoryMock()
@@ -133,6 +166,7 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
     setListMock()
     setTopicMock()
     setArchiveMock()
+    setInfoMock()
     channels = new Channels(mockHttpClient, testApiKey)
    }
 
@@ -198,5 +232,17 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
 
   "Channels.unarchive()" should "unarchive and return true if succeeded" in {
     channels.unarchive("C12345") shouldBe true
+  }
+
+  "Channels.info()" should "get channel info" in {
+    val response = channels.info("C024BE91L")
+    response.ok shouldBe true
+
+    val channel = response.channel
+    channel.id shouldBe "C024BE91L"
+    channel.isGeneral shouldBe false
+    channel.lastRead shouldBe 1401383885.000061
+    channel.unreadCount shouldBe 0
+    channel.unreadCountDisplay shouldBe 0
   }
 }

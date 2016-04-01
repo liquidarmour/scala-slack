@@ -24,7 +24,7 @@ package com.ponkotuy.slack.methods
 
 import com.ponkotuy.slack.responses._
 import com.ponkotuy.slack.HttpClient
-import org.json4s.DefaultFormats
+import org.json4s._
 
 
 /**
@@ -116,5 +116,15 @@ class Channels(httpClient: HttpClient, apiToken: String) {
   def unarchive(channel: String): Boolean = {
     val response = httpClient.get("channels.unarchive", Map("token" -> apiToken, "channel" -> channel))
     (response \ "ok").extract[Boolean]
+  }
+
+  /**
+    * https://api.slack.com/methods/channels.info
+    */
+  def info(channel: String): ChannelInfoResponse = {
+    val response = httpClient.get("channels.info", Map("token" -> apiToken, "channel" -> channel))
+    response.camelizeKeys.transformField {
+      case ("lastRead", JString(jStr)) => "lastRead" -> JDouble(jStr.toDouble)
+    }.extract[ChannelInfoResponse]
   }
 }
