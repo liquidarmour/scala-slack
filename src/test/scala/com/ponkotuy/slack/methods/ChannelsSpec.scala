@@ -159,6 +159,42 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
         .thenReturn(json)
   }
 
+  private[this] def setInviteMock(): Unit = {
+    val json = parse(
+      """
+        |{
+        |    "ok": true,
+        |    "channel": {
+        |        "id": "C024BE91L",
+        |        "name": "fun",
+        |        "created": 1360782804,
+        |        "creator": "U024BE7LH",
+        |        "is_archived": false,
+        |        "is_member": true,
+        |        "is_general": false,
+        |        "last_read": "1401383885.000061",
+        |        "latest": {},
+        |        "unread_count": 0,
+        |        "unread_count_display": 0,
+        |        "members": ["U12345"],
+        |        "topic": {
+        |            "value": "Fun times",
+        |            "creator": "U024BE7LV",
+        |            "last_set": 1369677212
+        |        },
+        |        "purpose": {
+        |            "value": "This channel is for fun",
+        |            "creator": "U024BE7LH",
+        |            "last_set": 1360782804
+        |        }
+        |    }
+        |}
+      """.stripMargin
+    )
+    when(mockHttpClient.get("channels.invite", Map("channel" -> "C024BE91L", "user" -> "U12345", "token" -> testApiKey)))
+        .thenReturn(json)
+  }
+
   override def beforeEach() {
     mockHttpClient = mock[HttpClient]
     setHistoryMock()
@@ -167,6 +203,7 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
     setTopicMock()
     setArchiveMock()
     setInfoMock()
+    setInviteMock()
     channels = new Channels(mockHttpClient, testApiKey)
    }
 
@@ -244,5 +281,15 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
     channel.lastRead shouldBe 1401383885.000061
     channel.unreadCount shouldBe 0
     channel.unreadCountDisplay shouldBe 0
+  }
+
+  "Channels.invite()" should "invite user and return the response in an ChannelInfoResponse" in {
+    val response = channels.invite("C024BE91L", "U12345")
+    response.ok shouldBe true
+    val channel = response.channel
+    channel.id shouldBe "C024BE91L"
+    channel.name shouldBe "fun"
+    channel.members should contain("U12345")
+    channel.lastRead shouldBe 1401383885.000061
   }
 }

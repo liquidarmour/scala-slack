@@ -22,7 +22,7 @@
 
 package com.ponkotuy.slack.responses
 
-import org.json4s.JValue
+import org.json4s._
 
 /**
  * Class for representing a Slack channel
@@ -67,3 +67,9 @@ case class SlackChannelInfo(
     unreadCount: Int,
     unreadCountDisplay: Int
 ) extends SlackChannelBase
+
+object SlackChannelInfo {
+  def transform: PartialFunction[(String, JValue), (String, JValue)] = {
+    case ("last_read", JString(jStr)) => "last_read" -> JDouble(jStr.toDouble)
+  }
+}

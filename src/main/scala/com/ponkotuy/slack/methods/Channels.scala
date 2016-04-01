@@ -123,8 +123,14 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     */
   def info(channel: String): ChannelInfoResponse = {
     val response = httpClient.get("channels.info", Map("token" -> apiToken, "channel" -> channel))
-    response.camelizeKeys.transformField {
-      case ("lastRead", JString(jStr)) => "lastRead" -> JDouble(jStr.toDouble)
-    }.extract[ChannelInfoResponse]
+    response.transformField(SlackChannelInfo.transform).camelizeKeys.extract[ChannelInfoResponse]
+  }
+
+  /**
+    * https://api.slack.com/methods/channels.invite
+    */
+  def invite(channel: String, user: String): ChannelInfoResponse = {
+    val response = httpClient.get("channels.invite", Map("token" -> apiToken, "channel" -> channel, "user" -> user))
+    response.transformField(SlackChannelInfo.transform).camelizeKeys.extract[ChannelInfoResponse]
   }
 }
