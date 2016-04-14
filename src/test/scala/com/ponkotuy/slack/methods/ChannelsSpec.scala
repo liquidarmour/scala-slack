@@ -203,6 +203,11 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
         .thenReturn(json)
   }
 
+  private[this] def setKickMock(): Unit = {
+    when(mockHttpClient.get("channels.kick", Map("channel" -> "C12345", "user" -> "U12345", "token" -> testApiKey)))
+        .thenReturn(success)
+  }
+
   override def beforeEach() {
     mockHttpClient = mock[HttpClient]
     setHistoryMock()
@@ -213,6 +218,7 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
     setInfoMock()
     setInviteMock()
     setJoinMock()
+    setKickMock()
     channels = new Channels(mockHttpClient, testApiKey)
    }
 
@@ -309,5 +315,9 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
   "Channels.join()" should "join user and return the response in an ChannelInfoResponse" in {
     val response = channels.join("fun")
     channelInfoCheck(response)
+  }
+
+  "Channels.kick()" should "kick user from channel and return the response true" in {
+    channels.kick("C12345", "U12345") shouldBe true
   }
 }

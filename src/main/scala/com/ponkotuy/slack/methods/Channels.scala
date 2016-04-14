@@ -107,7 +107,7 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     */
   def archive(channel: String): Boolean = {
     val response = httpClient.get("channels.archive", Map("token" -> apiToken, "channel" -> channel))
-    (response \ "ok").extract[Boolean]
+    responseBoolean(response)
   }
 
   /**
@@ -115,7 +115,7 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     */
   def unarchive(channel: String): Boolean = {
     val response = httpClient.get("channels.unarchive", Map("token" -> apiToken, "channel" -> channel))
-    (response \ "ok").extract[Boolean]
+    responseBoolean(response)
   }
 
   /**
@@ -141,4 +141,14 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     val response = httpClient.get("channels.join", Map("token" -> apiToken, "name" -> name))
     response.transformField(SlackChannelInfo.transform).camelizeKeys.extract[ChannelInfoResponse]
   }
+
+  /**
+    * https://api.slack.com/methods/channels.kick
+    */
+  def kick(channel: String, user: String): Boolean = {
+    val response = httpClient.get("channels.kick", Map("token" -> apiToken, "channel" -> channel, "user" -> user))
+    responseBoolean(response)
+  }
+
+  def responseBoolean(response: JValue) = (response \ "ok").extract[Boolean]
 }
