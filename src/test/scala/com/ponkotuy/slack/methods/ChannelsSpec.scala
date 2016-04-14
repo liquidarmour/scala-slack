@@ -307,9 +307,9 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
     val channel = response.channel
     channel.id shouldBe "C024BE91L"
     channel.isGeneral shouldBe false
-    channel.lastRead shouldBe 1401383885.000061
-    channel.unreadCount shouldBe 0
-    channel.unreadCountDisplay shouldBe 0
+    channel.lastRead shouldBe Some(1401383885.000061)
+    channel.unreadCount shouldBe Some(0)
+    channel.unreadCountDisplay shouldBe Some(0)
   }
 
   private def channelInfoCheck(res: ChannelInfoResponse): Unit = {

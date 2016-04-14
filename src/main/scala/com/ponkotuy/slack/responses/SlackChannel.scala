@@ -62,10 +62,10 @@ case class SlackChannelInfo(
     members: List[String],
     topic: JValue,
     purpose: JValue,
-    lastRead: Double,
+    lastRead: Option[Double],
     latest: JValue,
-    unreadCount: Int,
-    unreadCountDisplay: Int
+    unreadCount: Option[Int],
+    unreadCountDisplay: Option[Int]
 ) extends SlackChannelBase
 
 object SlackChannelInfo {
