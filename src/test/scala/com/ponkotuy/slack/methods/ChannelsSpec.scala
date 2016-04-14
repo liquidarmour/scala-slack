@@ -215,6 +215,11 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
         .thenReturn(("ok" -> true) ~ ("not_in_channel" -> true))
   }
 
+  private[this] def setMarkMock(): Unit = {
+    when(mockHttpClient.get("channels.mark", Map("channel" -> "C12345", "ts" -> "1234567890.1" ,"token" -> testApiKey)))
+        .thenReturn(success)
+  }
+
   override def beforeEach() {
     mockHttpClient = mock[HttpClient]
     setHistoryMock()
@@ -227,6 +232,7 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
     setJoinMock()
     setKickMock()
     setLeaveMock()
+    setMarkMock()
     channels = new Channels(mockHttpClient, testApiKey)
    }
 
@@ -339,5 +345,9 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
     val response = channels.leave("C23456")
     response.ok shouldBe true
     response.notInChannel shouldBe Some(true)
+  }
+
+  "Channels.mark()" should "return the response true" in {
+    channels.mark("C12345", "1234567890.1") shouldBe true
   }
 }

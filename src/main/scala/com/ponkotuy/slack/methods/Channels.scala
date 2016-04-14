@@ -158,5 +158,13 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     response.camelizeKeys.extract[ChannelLeaveResponse]
   }
 
+  /**
+    * https://api.slack.com/methods/channels.mark
+    */
+  def mark(channel: String, ts: String): Boolean = {
+    val response = httpClient.get("channels.mark", Map("token" -> apiToken, "channel" -> channel, "ts" -> ts))
+    responseBoolean(response)
+  }
+
   def responseBoolean(response: JValue) = (response \ "ok").extract[Boolean]
 }
