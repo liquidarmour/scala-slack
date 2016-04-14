@@ -36,6 +36,7 @@ case class ChannelListResponse(ok: Boolean, channels: List[SlackChannel])
 case class ChannelSetTopicResponse(ok: Boolean, topic: String)
 case class ChannelInfoResponse(ok: Boolean, channel: SlackChannelInfo)
 case class ChannelLeaveResponse(ok: Boolean, notInChannel: Option[Boolean])
+case class ChannelRenameResponse(ok: Boolean, channel: SlackChannelMinImpl)
 
 case class IMCloseResponse(ok: Boolean, noOp: Option[Boolean], alreadyClosed: Option[Boolean])
 case class IMMarkResponse(ok: Boolean)

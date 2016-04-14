@@ -166,5 +166,14 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     responseBoolean(response)
   }
 
+  /**
+    * https://api.slack.com/methods/channels.rename
+    */
+  def rename(channel: String, name: String): ChannelRenameResponse = {
+    val response = httpClient.get("channels.rename", Map("token" -> apiToken, "channel" -> channel, "name" -> name))
+    println(response)
+    response.camelizeKeys.extract[ChannelRenameResponse]
+  }
+
   def responseBoolean(response: JValue) = (response \ "ok").extract[Boolean]
 }

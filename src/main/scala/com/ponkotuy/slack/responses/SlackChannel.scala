@@ -41,15 +41,20 @@ import org.json4s._
 case class SlackChannel(id: String, name: String, created: Long, creator: String, isArchived: Boolean, isMember: Boolean,
                         members: List[String], numMembers: Int, topic: JValue, purpose: JValue) extends SlackChannelBase
 
-trait SlackChannelBase {
+trait SlackChannelMin {
   def id: String
   def name: String
   def created: Long
+}
+
+trait SlackChannelBase extends SlackChannelMin {
   def creator: String
   def isArchived: Boolean
   def isMember: Boolean
   def members: List[String]
 }
+
+case class SlackChannelMinImpl(id: String, isChannel: Boolean, name: String, created: Long) extends SlackChannelMin
 
 case class SlackChannelInfo(
     id: String,

@@ -220,6 +220,14 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
         .thenReturn(success)
   }
 
+  private[this] def setRenameMock(): Unit = {
+    val json = ("ok" -> true) ~
+        ("channel" ->
+            ("id" -> "C024BE91L") ~ ("is_channel" -> true) ~ ("name" -> "new_name") ~ ("created" -> 1360782804))
+    when(mockHttpClient.get("channels.rename", Map("channel" -> "C024BE91L", "name" -> "new_name", "token" -> testApiKey)))
+        .thenReturn(json)
+  }
+
   override def beforeEach() {
     mockHttpClient = mock[HttpClient]
     setHistoryMock()
@@ -233,6 +241,7 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
     setKickMock()
     setLeaveMock()
     setMarkMock()
+    setRenameMock()
     channels = new Channels(mockHttpClient, testApiKey)
    }
 
@@ -349,5 +358,14 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
 
   "Channels.mark()" should "return the response true" in {
     channels.mark("C12345", "1234567890.1") shouldBe true
+  }
+
+  "Channels.rename()" should "return the response in an ChannelRenameResponse" in {
+    val response = channels.rename("C024BE91L", "new_name")
+    response.ok shouldBe true
+    val channel = response.channel
+    channel.isChannel shouldBe true
+    channel.id shouldBe "C024BE91L"
+    channel.name shouldBe "new_name"
   }
 }
