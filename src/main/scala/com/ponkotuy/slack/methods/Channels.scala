@@ -133,4 +133,12 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     val response = httpClient.get("channels.invite", Map("token" -> apiToken, "channel" -> channel, "user" -> user))
     response.transformField(SlackChannelInfo.transform).camelizeKeys.extract[ChannelInfoResponse]
   }
+
+  /**
+    * https://api.slack.com/methods/channels.join
+    */
+  def join(name: String): ChannelInfoResponse = {
+    val response = httpClient.get("channels.join", Map("token" -> apiToken, "name" -> name))
+    response.transformField(SlackChannelInfo.transform).camelizeKeys.extract[ChannelInfoResponse]
+  }
 }
