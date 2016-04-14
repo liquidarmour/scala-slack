@@ -208,6 +208,13 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
         .thenReturn(success)
   }
 
+  private[this] def setLeaveMock(): Unit = {
+    when(mockHttpClient.get("channels.leave", Map("channel" -> "C12345", "token" -> testApiKey)))
+        .thenReturn(success)
+    when(mockHttpClient.get("channels.leave", Map("channel" -> "C23456", "token" -> testApiKey)))
+        .thenReturn(("ok" -> true) ~ ("not_in_channel" -> true))
+  }
+
   override def beforeEach() {
     mockHttpClient = mock[HttpClient]
     setHistoryMock()
@@ -219,6 +226,7 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
     setInviteMock()
     setJoinMock()
     setKickMock()
+    setLeaveMock()
     channels = new Channels(mockHttpClient, testApiKey)
    }
 
@@ -319,5 +327,17 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
 
   "Channels.kick()" should "kick user from channel and return the response true" in {
     channels.kick("C12345", "U12345") shouldBe true
+  }
+
+  "Channels.leave()" should "leave from channel and return the response true" in {
+    val response = channels.leave("C12345")
+    response.ok shouldBe true
+    response.notInChannel shouldBe None
+  }
+
+  "Channels.leave(not in channel)" should "return the response not_in_channel" in {
+    val response = channels.leave("C23456")
+    response.ok shouldBe true
+    response.notInChannel shouldBe Some(true)
   }
 }

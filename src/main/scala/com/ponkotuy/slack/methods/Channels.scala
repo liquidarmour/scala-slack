@@ -150,5 +150,13 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     responseBoolean(response)
   }
 
+  /**
+    * https://api.slack.com/methods/channels.leave
+    */
+  def leave(channel: String): ChannelLeaveResponse = {
+    val response = httpClient.get("channels.leave", Map("token" -> apiToken, "channel" -> channel))
+    response.camelizeKeys.extract[ChannelLeaveResponse]
+  }
+
   def responseBoolean(response: JValue) = (response \ "ok").extract[Boolean]
 }
