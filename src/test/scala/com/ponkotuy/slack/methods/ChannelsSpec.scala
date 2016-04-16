@@ -228,6 +228,13 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
         .thenReturn(json)
   }
 
+  private[this] def setPurposeMock(): Unit = {
+    val json = ("ok" -> true) ~ ("purpose" -> "This is the new purpose!")
+    val params = Map("channel" -> "C12345", "purpose" -> "This is the new purpose!", "token" -> testApiKey)
+    when(mockHttpClient.get("channels.setPurpose", params))
+        .thenReturn(json)
+  }
+
   override def beforeEach() {
     mockHttpClient = mock[HttpClient]
     setHistoryMock()
@@ -242,6 +249,7 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
     setLeaveMock()
     setMarkMock()
     setRenameMock()
+    setPurposeMock()
     channels = new Channels(mockHttpClient, testApiKey)
    }
 
@@ -367,5 +375,11 @@ class ChannelsSpec extends FlatSpec with MockitoSugar with Matchers with BeforeA
     channel.isChannel shouldBe true
     channel.id shouldBe "C024BE91L"
     channel.name shouldBe "new_name"
+  }
+
+  "Channels.setPurpose()" should "return the response in an ChannelSetPurposeResponse" in {
+    val res = channels.setPurpose("C12345", "This is the new purpose!")
+    res.ok shouldBe true
+    res.purpose shouldBe "This is the new purpose!"
   }
 }

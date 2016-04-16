@@ -171,9 +171,16 @@ class Channels(httpClient: HttpClient, apiToken: String) {
     */
   def rename(channel: String, name: String): ChannelRenameResponse = {
     val response = httpClient.get("channels.rename", Map("token" -> apiToken, "channel" -> channel, "name" -> name))
-    println(response)
     response.camelizeKeys.extract[ChannelRenameResponse]
   }
 
-  def responseBoolean(response: JValue) = (response \ "ok").extract[Boolean]
+  /**
+    * https://api.slack.com/methods/channels.setPurpose
+    */
+  def setPurpose(channel: String, purpose: String): ChannelSetPurpsoeResponse = {
+    val res = httpClient.get("channels.setPurpose", Map("token" -> apiToken, "channel" -> channel, "purpose" -> purpose))
+    res.camelizeKeys.extract[ChannelSetPurpsoeResponse]
+  }
+
+  private def responseBoolean(response: JValue) = (response \ "ok").extract[Boolean]
 }
