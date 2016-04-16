@@ -10,22 +10,10 @@ is subject to frequent change._
 
  - api.test
  - auth.test
- - channels.history
- - channels.list
- - channels.setTopic
- - chat.delete
- - chat.postMessage
- - chat.update
- - im.close
- - im.history
- - im.list
- - im.mark
- - im.open
- - users.info
- - users.list
- - users.getPresence
- - users.setActive
- - users.setPresence
+ - channels.{history, list, setTopic, archive, unarchive, info, invite, join, kick, leave, mark, rename, setPurpose}
+ - chat.{delete, postMessage, update}
+ - im.{close, history, list, mark, open}
+ - users.{info, list, getPresence, setArchive, setPresence}
 
 ## Download
 
